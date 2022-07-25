@@ -5,12 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/flowbite@1.5.1/dist/flowbite.min.css" />
-    <title>Create account</title>
+    <title>Registration</title>
 </head>
 <body>
 <div class="container mx-auto px-4 md:max-w-xl">
 <h1 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-					CREATE AN ACCOUNT
+					Create an account
 </h1>
 <form action="create.php" method="POST">
   <div class="relative z-0 mb-6 w-full group">
@@ -52,10 +52,13 @@
   </div> -->
   <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Submit</button>
 </form>
-<p class="mt-6 text-center text-4xl font-extrabold text-red-500">
+<p class="mt-6 text-center text-4xl font-extrabold text-green-500">
     <?php
     if (isset($_GET['msgCreate'])) {
         echo urldecode($_GET['msgCreate']);
+    }
+    if (isset($_GET['msg'])) {
+        echo "<span class='text-red-500'>" . urldecode($_GET['msg']). "</span>";
     }
     ?>
 </p>
