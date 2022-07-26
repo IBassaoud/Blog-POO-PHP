@@ -1,5 +1,47 @@
 <?php
+require_once("../../pdo.php");
 session_start();
+
+if($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['email'] != "" && $_POST['password'] != ""){
+  // echo "<pre>";
+  // var_dump($_POST);
+  $email = $_POST['email'];
+  $query_checkEmail = "SELECT * FROM USERS WHERE `email_user` = '$email'";
+  try {
+    $stmt_checkEmail = $dbh->query($query_checkEmail)->rowCount();
+    // $ifExistMsg = urlencode("Pseudo already taken, choose another one!");
+    // header('Location: register.php?msg='.$ifExistMsg);
+  }
+  catch (PDOException $e) {
+      echo "Insertion failed: " . $e->getMessage();
+  }
+  if ($stmt_checkEmail == 1){  
+    $query_checkPass = "SELECT `pw_user` FROM USERS WHERE `email_user` = '$email'";
+    try {
+      $stmt_checkPass = $dbh->query($query_checkPass)->fetch(PDO::FETCH_ASSOC);
+      // $ifExistMsg = urlencode("Pseudo already taken, choose another one!");
+      // header('Location: register.php?msg='.$ifExistMsg);
+      // var_dump($stmt_checkPass);
+
+    }
+    catch (PDOException $e) {
+        echo "Insertion failed: " . $e->getMessage();
+    }
+    if (password_verify($_POST['password'],$stmt_checkPass['pw_user']) == true){
+      // echo "<br>Mot de passe est bon!";
+      setCookie("CoookitoBlogo", time()+(60*60*24*360));
+      $_SESSION['logged'] = true;
+      header("Location: ../../index.php");
+    }
+  } else {$_GET['msg'] = urlencode("Email does not exist!");}
+
+  // $password = $_POST['password'];
+  // if ($_POST['password'] == $password && $_POST['email'] == $email){
+  //     setCookie("Coookito", time()+(60*60*24*360));
+  //     header("Location: ../../index.php");
+  //     $_SESSION['logged'] = true;
+  // } 
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -155,7 +197,7 @@ session_start();
         />
       </div>
       <div class="xl:ml-20 xl:w-5/12 lg:w-5/12 md:w-8/12 mb-12 md:mb-0">
-        <form>
+        <form action="<?= $_SERVER['PHP_SELF']; ?>" method="POST">
           <div class="flex flex-row items-center justify-center lg:justify-start">
             <p class="text-lg mb-0 mr-4">Sign in with</p>
             <button
@@ -248,8 +290,14 @@ session_start();
             </div>
             <a href="#!" class="text-gray-800">Forgot password?</a>
           </div>
-
-          <div class="text-center lg:text-left">
+          <P class="mt-6 text-center text-2xl pb-2 font-extrabold text-red-500">
+            <?php
+                if (isset($_GET['msg'])) {
+                  var_dump(urldecode($_GET['msg']));
+              }
+            ?>
+          </P>
+          <div class="text-center lg:text-center">
             <button type="Submit" class="inline-block px-8 py-3 bg-blue-600 text-white font-medium text-sm leading-snug uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out">
               Login
             </button>

@@ -1,6 +1,66 @@
 <?php
-require_once("../../pdo.php");
+session_start();
 
+require_once('../class/User.php');
+require_once('../../pdo.php');
+if ($_SERVER["REQUEST_METHOD"] == "POST"){
+  if(!empty($_POST["pseudo"]) && !empty($_POST["email"]) && !empty($_POST["password"]) && !empty(["repeat_password"]) && !empty($_POST["first_name"]) && !empty($_POST["last_name"]) && !empty($_POST["role"])){
+      if($_POST["password"] === $_POST["repeat_password"]){
+          $pseudo = $_POST['pseudo'];
+          $email = $_POST['email'];
+          $query_ifExist = "SELECT * FROM USERS WHERE `pseudo_user` = '$pseudo'"; 
+          try {
+            $stmt_ifExist = $dbh->query($query_ifExist)->rowCount();
+            if ($stmt_ifExist > 0){
+              $_GET['msg'] = urlencode("Pseudo already taken, choose another one!");
+            }
+            // $ifExistMsg = urlencode("Pseudo already taken, choose another one!");
+            // header('Location: register.php?msg='.$ifExistMsg);
+          }
+          catch (PDOException $e) {
+              echo "Insertion failed: " . $e->getMessage();
+          }
+          $query_ifExist2 = "SELECT * FROM USERS WHERE `email_user` = '$email'";
+          try {
+            $stmt_ifExist2 = $dbh->query($query_ifExist2)->rowCount();
+            if ($stmt_ifExist2 > 0){
+              $_GET['msg'] = urlencode("Email already taken, choose another one!");
+            }
+            // $ifExistMsg = urlencode("Pseudo already taken, choose another one!");
+            // header('Location: register.php?msg='.$ifExistMsg);
+          }
+          catch (PDOException $e) {
+              echo "Insertion failed: " . $e->getMessage();
+          }
+
+          if ($stmt_ifExist == 0 && $stmt_ifExist2 == 0) {
+            $hashedpass = password_hash($_POST['password'],PASSWORD_BCRYPT); 
+            $firstname = $_POST['first_name'];
+            $lastname = $_POST['last_name'];
+            $role = $_POST['role'];
+            
+            $newuser = new User($firstname, $lastname,$pseudo,$email, $role,$hashedpass);
+            $newuser->saveUser();
+            $_SESSION['user'] = $newuser;
+          
+            // $insert_user_query = "INSERT INTO `USERS` (`pseudo_user`, `email_user`, `pw_user`, `prenom_user`, `nom_user`, `role_user`) VALUES('$pseudo', '$email', '$hashedpassword', '$firstname', '$lastname','$role')";
+            // try {
+            //   $sth = $dbh->query($insert_user_query);
+            //   $createdmsg = urlencode("&#9989 User created successfully!");
+            //   // header('Location: register.php?msgCreate='.$createdmsg);
+            //   $_GET['msgCreate'] = $createdmsg;
+            // }
+            // catch (PDOException $e) {
+            //   echo "Insertion failed: " . $e->getMessage();
+            // }
+          } 
+        } else {
+          $msg = urlencode("The two passwords are not matching!");
+          // header('Location: register.php?msg='.$msg);
+          $_GET['msg'] = $msg;
+          }   
+  } 
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -81,7 +141,7 @@ require_once("../../pdo.php");
               <a
                 class="md:p-4 py-2 block hover:text-blue-400 text-blue-500"
                 href="http://localhost:8006/assets/php/login.php"
-                >Sign Up</a
+                >Sign in</a
               >
             </li>
               <a
@@ -96,7 +156,7 @@ require_once("../../pdo.php");
   </header>
 
 <div class="container mx-auto px-4 md:max-w-xl">
-<h1 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+<h1 class="mt-6 text-center text-3xl font-extrabold text-gray-900 font-serif">
 					Create an account
 </h1>
 <form action="<?= $_SERVER['PHP_SELF']; ?>" method="POST">
@@ -141,62 +201,7 @@ require_once("../../pdo.php");
 </form>
 <p class="mt-6 text-center text-4xl font-extrabold text-green-500">
     <?php
-    if ($_SERVER["REQUEST_METHOD"] == "POST"){
-
-      if(!empty($_POST["pseudo"]) && !empty($_POST["email"]) && !empty($_POST["password"]) && !empty(["repeat_password"]) && !empty($_POST["first_name"]) && !empty($_POST["last_name"]) && !empty($_POST["role"])){
-          if($_POST["password"] === $_POST["repeat_password"]){
-              $pseudo = $_POST['pseudo'];
-              $email = $_POST['email'];
-              $query_ifExist = "SELECT * FROM USERS WHERE `pseudo_user` = '$pseudo'"; 
-              try {
-                $stmt_ifExist = $dbh->query($query_ifExist)->rowCount();
-                if ($stmt_ifExist > 0){
-                  $_GET['msg'] = urlencode("Pseudo already taken, choose another one!");
-                }
-                // $ifExistMsg = urlencode("Pseudo already taken, choose another one!");
-                // header('Location: register.php?msg='.$ifExistMsg);
-              }
-              catch (PDOException $e) {
-                  echo "Insertion failed: " . $e->getMessage();
-              }
-              $query_ifExist2 = "SELECT * FROM USERS WHERE `email_user` = '$email'";
-              try {
-                $stmt_ifExist2 = $dbh->query($query_ifExist2)->rowCount();
-                if ($stmt_ifExist2 > 0){
-                  $_GET['msg'] = urlencode("Email already taken, choose another one!");
-                }
-                // $ifExistMsg = urlencode("Pseudo already taken, choose another one!");
-                // header('Location: register.php?msg='.$ifExistMsg);
-              }
-              catch (PDOException $e) {
-                  echo "Insertion failed: " . $e->getMessage();
-              }
-  
-              if ($stmt_ifExist == 0 && $stmt_ifExist2 == 0) {
-                $hashedpassword = password_hash($_POST['password'],PASSWORD_BCRYPT); 
-                $firstname = $_POST['first_name'];
-                $lastname = $_POST['last_name'];
-                $role = $_POST['role'];
-  
-                $insert_user_query = "INSERT INTO `USERS` (`pseudo_user`, `email_user`, `pw_user`, `prenom_user`, `nom_user`, `role_user`) VALUES('$pseudo', '$email', '$hashedpassword', '$firstname', '$lastname','$role')";
-                try {
-                  $sth = $dbh->query($insert_user_query);
-                  $createdmsg = urlencode("&#9989 User created successfully!");
-                  // header('Location: register.php?msgCreate='.$createdmsg);
-                  $_GET['msgCreate'] = $createdmsg;
-                }
-                catch (PDOException $e) {
-                  echo "Insertion failed: " . $e->getMessage();
-                }
-              } 
-            } else {
-              $msg = urlencode("The two passwords are not matching!");
-              // header('Location: register.php?msg='.$msg);
-              $_GET['msg'] = $msg;
-              }   
-      } 
-  }
-
+    echo $_SESSION['user'];
     if (isset($_GET['msgCreate'])) {
         echo urldecode($_GET['msgCreate']);
     }

@@ -19,7 +19,7 @@ catch (PDOException $e) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/flowbite@1.5.1/dist/flowbite.min.css" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Blog</title>
+    <title>The Blog</title>
 </head>
 <body>
 <header>
@@ -89,7 +89,7 @@ catch (PDOException $e) {
               <a
                 class="md:p-4 py-2 block hover:text-blue-400 text-blue-500"
                 href="http://localhost:8006/assets/php/login.php"
-                >Sign Up</a
+                >Sign in</a
               >
             </li>
               <a
