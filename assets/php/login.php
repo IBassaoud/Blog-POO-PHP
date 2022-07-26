@@ -8,9 +8,93 @@ session_start();
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/flowbite@1.5.1/dist/flowbite.min.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/assets/js/navbar.js"></script>
     <title>Sign in</title>
 </head>
-<body>
+<body class="overflow-x-hidden">
+<header>
+     <nav
+        class="
+          flex flex-wrap
+          items-center
+          justify-between
+          w-full
+          py-4
+          md:py-0
+          px-4
+          text-lg text-gray-700
+          bg-white
+        "
+      >
+       <a href="http://localhost:8006/" class="flex items-center">
+        <img src="/assets/img/logo_blog.png" class="mr-3 h-6 sm:h-9"/>
+        <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-black">The Blog</span>
+      </a>
+      
+         <svg
+            xmlns="http://www.w3.org/2000/svg"
+            id="menu-button"
+            class="h-6 w-6 cursor-pointer md:hidden block"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+       
+       <div class="hidden w-full md:flex md:items-center md:w-auto" id="menu">
+          <ul
+            class="
+              pt-4
+              text-base text-gray-700
+              md:flex
+              md:justify-between 
+              md:pt-0"
+          >
+            <li>
+              <a class="md:p-4 py-2 block hover:text-blue-400" href="http://localhost:8006"
+                >Home</a
+              >
+            </li>
+            <li>
+              <a class="md:p-4 py-2 block hover:text-blue-400" href="#"
+                >Posts</a
+              >
+            </li>
+            <li>
+              <a class="md:p-4 py-2 block hover:text-blue-400" href="#"
+                >Bookmarks</a
+              >
+            </li>
+            <!-- <li>
+              <a class="md:p-4 py-2 block hover:text-blue-400" href="#"
+                >Blog</a
+              >
+            </li> -->
+            <li>
+              <a
+                class="md:p-4 py-2 block hover:text-blue-400 text-blue-500"
+                href="http://localhost:8006/assets/php/login.php"
+                >Sign in</a
+              >
+            </li>
+              <a
+                class="md:p-4 py-2 block hover:text-blue-400 text-blue-500"
+                href="http://localhost:8006/assets/php/register.php"
+                >Register</a
+              >
+            </li>
+          </ul>
+        </div>
+    </nav>
+  </header>
+  
 <!-- <div class="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
   <div class="max-w-md w-full space-y-8">
     <div>
@@ -155,10 +239,10 @@ session_start();
             <div class="form-group form-check">
               <input
                 type="checkbox"
-                class="form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 align-top bg-no-repeat bg-center bg-contain float-left cursor-pointer"
+                class="form-check-input appearance-none h-4 w-4 mt-1 mr-2 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 align-top bg-no-repeat bg-center bg-contain float-left cursor-pointer"
                 id="remember_me_check"
               />
-              <label class="form-check-label inline-block text-gray-800 mr-8" for="remember_me_check"
+              <label class="form-check-label inline-block text-gray-800" for="remember_me_check"
                 >Remember me</label
               >
             </div>
@@ -166,7 +250,7 @@ session_start();
           </div>
 
           <div class="text-center lg:text-left">
-            <button type="Submit" class="inline-block px-6 py-3 bg-blue-600 text-white font-medium text-sm leading-snug uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out">
+            <button type="Submit" class="inline-block px-8 py-3 bg-blue-600 text-white font-medium text-sm leading-snug uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out">
               Login
             </button>
             <p class="text-sm font-semibold mt-2 pt-1 mb-0">
