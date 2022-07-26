@@ -1,3 +1,7 @@
+<?php
+require_once("../../pdo.php");
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -95,7 +99,7 @@
 <h1 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
 					Create an account
 </h1>
-<form action="create.php" method="POST">
+<form action="<?= $_SERVER['PHP_SELF']; ?>" method="POST">
   <div class="relative z-0 mb-6 w-full group">
       <input type="text" name="pseudo" id="pseudo" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-gray-900 dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required="">
       <label for="pseudo" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Pseudo</label>
@@ -137,12 +141,74 @@
 </form>
 <p class="mt-6 text-center text-4xl font-extrabold text-green-500">
     <?php
+    if ($_SERVER["REQUEST_METHOD"] == "POST"){
+
+      if(!empty($_POST["pseudo"]) && !empty($_POST["email"]) && !empty($_POST["password"]) && !empty(["repeat_password"]) && !empty($_POST["first_name"]) && !empty($_POST["last_name"]) && !empty($_POST["role"])){
+          if($_POST["password"] === $_POST["repeat_password"]){
+              $pseudo = $_POST['pseudo'];
+              $email = $_POST['email'];
+              $query_ifExist = "SELECT * FROM USERS WHERE `pseudo_user` = '$pseudo'"; 
+              try {
+                $stmt_ifExist = $dbh->query($query_ifExist)->rowCount();
+                if ($stmt_ifExist > 0){
+                  $_GET['msg'] = urlencode("Pseudo already taken, choose another one!");
+                }
+                // $ifExistMsg = urlencode("Pseudo already taken, choose another one!");
+                // header('Location: register.php?msg='.$ifExistMsg);
+              }
+              catch (PDOException $e) {
+                  echo "Insertion failed: " . $e->getMessage();
+              }
+              $query_ifExist2 = "SELECT * FROM USERS WHERE `email_user` = '$email'";
+              try {
+                $stmt_ifExist2 = $dbh->query($query_ifExist2)->rowCount();
+                if ($stmt_ifExist2 > 0){
+                  $_GET['msg'] = urlencode("Email already taken, choose another one!");
+                }
+                // $ifExistMsg = urlencode("Pseudo already taken, choose another one!");
+                // header('Location: register.php?msg='.$ifExistMsg);
+              }
+              catch (PDOException $e) {
+                  echo "Insertion failed: " . $e->getMessage();
+              }
+  
+              if ($stmt_ifExist == 0 && $stmt_ifExist2 == 0) {
+                $hashedpassword = password_hash($_POST['password'],PASSWORD_BCRYPT); 
+                $firstname = $_POST['first_name'];
+                $lastname = $_POST['last_name'];
+                $role = $_POST['role'];
+  
+                $insert_user_query = "INSERT INTO `USERS` (`pseudo_user`, `email_user`, `pw_user`, `prenom_user`, `nom_user`, `role_user`) VALUES('$pseudo', '$email', '$hashedpassword', '$firstname', '$lastname','$role')";
+                try {
+                  $sth = $dbh->query($insert_user_query);
+                  $createdmsg = urlencode("&#9989 User created successfully!");
+                  // header('Location: register.php?msgCreate='.$createdmsg);
+                  $_GET['msgCreate'] = $createdmsg;
+                }
+                catch (PDOException $e) {
+                  echo "Insertion failed: " . $e->getMessage();
+                }
+              } 
+            } else {
+              $msg = urlencode("The two passwords are not matching!");
+              // header('Location: register.php?msg='.$msg);
+              $_GET['msg'] = $msg;
+              }   
+      } 
+  }
+
     if (isset($_GET['msgCreate'])) {
         echo urldecode($_GET['msgCreate']);
     }
     if (isset($_GET['msg'])) {
         echo "<span class='text-red-500'>" . urldecode($_GET['msg']). "</span>";
     }
+    // if (isset($_GET['msgPseudo'])) {
+    //     echo "<span class='text-red-500'>" . urldecode($_GET['msgPseudo']). "</span>";
+    // }
+    // if (isset($_GET['msgEmail'])) {
+    //     echo "<span class='text-red-500'>" . urldecode($_GET['msgEmail']). "</span>";
+    // }
     ?>
 </p>
 </div>

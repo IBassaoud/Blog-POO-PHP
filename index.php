@@ -102,8 +102,7 @@ catch (PDOException $e) {
         </div>
     </nav>
   </header>    
-    <h1>My super blog</h1>
-    <h2 class="text-3xl font-bold underline">Hello world!</h2>
+    <h1 class="text-3xl font-bold underline">Hello world!</h1>
     <?php
     echo "<pre>";
     var_dump($sth);
