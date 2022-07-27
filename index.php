@@ -1,26 +1,8 @@
 <?php 
 require_once('pdo.php');
 require_once('assets/class/User.php');
+require_once('assets/class/Post.php');
 session_start();
-
-// if (isset($_SESSION['user'])){
-//   echo "<pre>";
-//   print_r($_SESSION['user']);
-//   print_r($_SESSION['user']->getNom());
-//   echo " ";
-//   print_r($_SESSION['user']->getPrenom());
-//   $date = date_create($_SESSION['user']->getCreatedAt());
-//   echo "<br>";
-//   echo date_format($date, 'd-m-Y');
-//   // echo $date->format('d-m-Y H:i:s');
-//   echo "</pre>";
-//   if ($_SESSION['user']->getIsLogged() == true){
-//     echo "</br>Logged in succesfully.";
-//   }
-//   if ($_SESSION['user']->getIsLogged() == false){
-//     echo "</br>This shouldn't work.";
-//   }
-// }
 
 $read_query_mainpage = "SELECT * FROM `POSTS` ORDER BY `created_at` DESC LIMIT 5;";
 try {
@@ -29,7 +11,20 @@ try {
 catch (PDOException $e) {
     echo "Read failed: " . $e->getMessage();
 }
-// echo "Hello world!";
+//BOUCLE qui instancie via la classe Post chaque posts retourner dans ma requête vers la BDD
+for ($i=0;$i<sizeof($sth);$i++){
+  $GLOBALS['allposts'][$i] = new Post($sth[$i]['id_post'],$sth[$i]['fk_id_user'],$sth[$i]['title_post'],$sth[$i]['description_post'],$sth[$i]['views_post'],$sth[$i]['image_post'],$sth[$i]['body_post'],$sth[$i]['published_post'],$sth[$i]['created_at']);
+}
+$length = sizeof($GLOBALS['allposts']);
+for ($i=0;$i<$length;$i++){
+  //replace the '..' by 'assets' on my image path
+  $img = $GLOBALS['allposts'][$i]->getimage_post();
+  $result = str_replace('..','assets',$img);
+  $GLOBALS['allposts'][$i]->setimage_post($result);
+  //change date format
+  $date = date_create($GLOBALS['allposts'][$i]->getcreated_at());
+  $GLOBALS['allposts'][$i]->setcreated_at(date_format($date, 'd-m-Y'));
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -39,6 +34,7 @@ catch (PDOException $e) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/flowbite@1.5.1/dist/flowbite.min.css" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="assets/js/main.js" defer></script>
     <title>The Blog</title>
 </head>
 <body>
@@ -148,43 +144,40 @@ catch (PDOException $e) {
 <!-- TODO changer le chemin de l'immage remplacer .. par assets -->
 <div class="pt-6 pb-12 bg-gray-300">  
     <h2 class="text-center font-serif  uppercase text-4xl xl:text-5xl">Recent Articles</h2>
-    
     <!-- container for all cards -->
     <div class="container w-100 lg:w-4/5 mx-auto flex flex-col">
-      <!-- card -->
-      <div v-for="card in cards" class="flex flex-col md:flex-row overflow-hidden bg-white rounded-lg shadow-xl  mt-4 w-100 mx-2">
-        <!-- media -->
-        <div class="h-64 w-auto md:w-1/2">
-          <img class="inset-0 h-full w-full object-cover object-center" src="assets/img/uploads/IMG-62e14276b3f785.62118025.jpg" />
-        </div>
-        <!-- content -->
-        <div class="w-full py-4 px-6 text-gray-800 flex flex-col justify-between">
-          <h3 class="font-semibold text-lg leading-tight truncate">Titre de mon article</h3>
-          <p class="mt-2">
-            Description : Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi, architecto.
-          </p>
-          <p class="text-sm text-gray-700 uppercase tracking-wide font-semibold mt-2">
-            Auteur : Lorem          </p>
-        </div>
-      </div>
-      
-        <!-- card -->
+    <?php
+       for ($i=0;$i<$length;$i++){
+        $myuser = $GLOBALS['allposts'][$i]->getfk_id_user();
+        $query_user = "SELECT * FROM `USERS` WHERE `id_user` = '$myuser'";
+        try {
+            $stmt_user = $dbh->query($query_user)->fetchAll(PDO::FETCH_ASSOC);
+        }
+        catch (PDOException $e) {
+            echo "Read failed: " . $e->getMessage();
+        }
+        echo '      <!-- card -->
         <div v-for="card in cards" class="flex flex-col md:flex-row overflow-hidden bg-white rounded-lg shadow-xl  mt-4 w-100 mx-2">
-        <!-- media -->
-        <div class="h-64 w-auto md:w-1/2">
-          <img class="inset-0 h-full w-full object-cover object-center" src="assets/img/uploads/IMG-62e14276b3f785.62118025.jpg" />
+          <!-- media -->
+          <div class="h-64 w-auto md:w-1/2">
+            <img class="inset-0 h-full w-full object-cover object-center" src="'.$GLOBALS['allposts'][$i]->getimage_post().'" />
+          </div>
+          <!-- content -->
+          <div class="w-full py-4 px-6 text-gray-800 flex flex-col justify-between">
+            <form method="post" action="assets/php/detail_post.php" id="form-title-click">
+            <button id="title-click" name="id_post" value="'.$GLOBALS['allposts'][$i]->getid_post().'" class="font-semibold text-lg leading-tight truncate">'.$GLOBALS['allposts'][$i]->gettitle_post().'</button>
+            </form>
+            <p class="mt-2">
+              '.$GLOBALS['allposts'][$i]->getdescription_post().'
+            </p>
+            <p class="text-sm text-gray-700 uppercase tracking-wide font-semibold mt-2">
+            Postée le '.$GLOBALS['allposts'][$i]->getcreated_at().' par '.$stmt_user[0]['prenom_user'].' '.$stmt_user[0]['nom_user'].'          
+            </p>
+          </div>
         </div>
-        <!-- content -->
-        <div class="w-full py-4 px-6 text-gray-800 flex flex-col justify-between">
-          <h3 class="font-semibold text-lg leading-tight truncate">Titre de mon article</h3>
-          <p class="mt-2">
-            Description : Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi, architecto.
-          </p>
-          <p class="text-sm text-gray-700 uppercase tracking-wide font-semibold mt-2">
-          Auteur : Lorem
-          </p>
-        </div>
-      </div><!--/ card--><!--/ card-->
+        ';
+      }
+    ?>
     </div>
     </div>
 <script src="https://unpkg.com/flowbite@1.5.1/dist/flowbite.js"></script>

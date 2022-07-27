@@ -1,20 +1,25 @@
 <?php 
 require_once('../../pdo.php');
 require_once('../class/User.php');
+require_once('../class/Post.php');
 session_start();
 
-$read_query_posts = "SELECT * FROM `POSTS`;";
+$read_query_allposts = "SELECT * FROM `POSTS` ORDER BY `created_at` DESC;";
 try {
-    $myposts = $dbh->query($read_query_posts)->fetch(PDO::FETCH_ASSOC);
+    $sth = $dbh->query($read_query_allposts)->fetchAll(PDO::FETCH_ASSOC);
 }
 catch (PDOException $e) {
     echo "Read failed: " . $e->getMessage();
 }
-
-// for ($i=0;$i<sizeof($myposts);$i++) {
-
-// }
-// print_r($myposts);
+//BOUCLE qui instancie via la classe Post chaque posts retourner dans ma requête vers la BDD
+for ($i=0;$i<sizeof($sth);$i++){
+    $GLOBALS['allposts'][$i] = new Post($sth[$i]['id_post'],$sth[$i]['fk_id_user'],$sth[$i]['title_post'],$sth[$i]['description_post'],$sth[$i]['views_post'],$sth[$i]['image_post'],$sth[$i]['body_post'],$sth[$i]['published_post'],$sth[$i]['created_at']);
+}
+$length = sizeof($GLOBALS['allposts']);
+for ($i=0;$i<$length;$i++){
+    $date = date_create($GLOBALS['allposts'][$i]->getcreated_at());
+    $GLOBALS['allposts'][$i]->setcreated_at(date_format($date, 'd-m-Y'));
+  }
 ?>
 
 
@@ -131,47 +136,46 @@ catch (PDOException $e) {
           </ul>
         </div>
     </nav>
-  </header>    
+</header>    
     <!-- <h1 class="text-3xl font-bold underline">All POSTS HERE!</h1> -->
     <div class="pt-6 pb-12 bg-gray-300">  
     <h2 class="text-center font-serif  uppercase text-4xl xl:text-5xl">Articles</h2>
     
     <!-- container for all cards -->
     <div class="container w-100 lg:w-4/5 mx-auto flex flex-col">
-      <!-- card -->
-      <div v-for="card in cards" class="flex flex-col md:flex-row overflow-hidden bg-white rounded-lg shadow-xl  mt-4 w-100 mx-2">
-        <!-- media -->
-        <div class="h-64 w-auto md:w-1/2">
-          <img class="inset-0 h-full w-full object-cover object-center" src="../img/uploads/IMG-62e14276b3f785.62118025.jpg" />
-        </div>
-        <!-- content -->
-        <div class="w-full py-4 px-6 text-gray-800 flex flex-col justify-between">
-          <h3 class="font-semibold text-lg leading-tight truncate">Titre de mon article</h3>
-          <p class="mt-2">
-            Description : Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi, architecto.
-          </p>
-          <p class="text-sm text-gray-700 uppercase tracking-wide font-semibold mt-2">
-            Auteur : Lorem          </p>
-        </div>
-      </div>
-      
-            <!-- card -->
+        <?php
+
+        for ($i=0;$i<$length;$i++){
+            $myuser = $GLOBALS['allposts'][$i]->getfk_id_user();
+            $query_user = "SELECT * FROM `USERS` WHERE `id_user` = '$myuser'";
+            try {
+                $stmt_user = $dbh->query($query_user)->fetchAll(PDO::FETCH_ASSOC);
+            }
+            catch (PDOException $e) {
+                echo "Read failed: " . $e->getMessage();
+            }
+            // print_r($stmt_user);
+            echo '      <!-- card -->
             <div v-for="card in cards" class="flex flex-col md:flex-row overflow-hidden bg-white rounded-lg shadow-xl  mt-4 w-100 mx-2">
-        <!-- media -->
-        <div class="h-64 w-auto md:w-1/2">
-          <img class="inset-0 h-full w-full object-cover object-center" src="../img/uploads/IMG-62e14276b3f785.62118025.jpg" />
-        </div>
-        <!-- content -->
-        <div class="w-full py-4 px-6 text-gray-800 flex flex-col justify-between">
-          <h3 class="font-semibold text-lg leading-tight truncate">Titre de mon article</h3>
-          <p class="mt-2">
-            Description : Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi, architecto.
-          </p>
-          <p class="text-sm text-gray-700 uppercase tracking-wide font-semibold mt-2">
-          Auteur : Lorem
-          </p>
-        </div>
-      </div><!--/ card--><!--/ card-->
+            <!-- media -->
+            <div class="h-64 w-auto md:w-1/2">
+            <img class="inset-0 h-full w-full object-cover object-center" src="'.$GLOBALS['allposts'][$i]->getimage_post().'" />
+            </div>
+            <!-- content -->
+            <div class="w-full py-4 px-6 text-gray-800 flex flex-col justify-between">
+            <form method="post" action="detail_post.php" id="form-title-click">
+            <button id="title-click" name="id_post" value="'.$GLOBALS['allposts'][$i]->getid_post().'" class="font-semibold text-lg leading-tight truncate">'.$GLOBALS['allposts'][$i]->gettitle_post().'</button>
+            </form>
+            <p class="mt-2">
+            '.$GLOBALS['allposts'][$i]->getdescription_post().'
+            </p>
+            <p class="text-sm text-gray-700 uppercase tracking-wide font-semibold mt-2">
+            Postée le '.$GLOBALS['allposts'][$i]->getcreated_at().' par '.$stmt_user[0]['prenom_user'].' '.$stmt_user[0]['nom_user'].'         
+            </p>
+            </div>
+            </div>';
+        }
+        ?>
     </div>
     </div><!--/ flex-->
  

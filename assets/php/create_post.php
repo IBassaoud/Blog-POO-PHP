@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             $img_extension = pathinfo($img_name, PATHINFO_EXTENSION);
             $img_extension_lc = strtolower($img_extension);
 
-            $allowed_extensions = ['jpg','jpeg','png'];
+            $allowed_extensions = ['jpg','jpeg','png','webp','gif'];
 
             if (in_array($img_extension_lc,$allowed_extensions)){
                 $new_img_name = uniqid("IMG-", true).'.'.$img_extension_lc;
@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             }
         }
     } else {
-        $msg = urlencode("Unknown error occured, enven I don't know WTF YOU DID!.");
+        $msg = urlencode("Unknown error occured, enven I don't know WTF YOU DID!.<br>");
         $_GET['msgError'] = $msg;
     }
 
@@ -182,8 +182,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         </div>
     </nav>
   </header>    
-<h1 class="text-3xl font-bold underline">C'est ici que tu vas créer ton merveilleux post!</h1>
-<div class="py-12">
+<div class="py-6 bg-gray-300">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-6 bg-white border-b border-gray-200">
