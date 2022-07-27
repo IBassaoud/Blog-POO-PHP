@@ -1,46 +1,42 @@
 <?php
 require_once("../../pdo.php");
+require_once("../class/User.php");
 session_start();
 
 if($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['email'] != "" && $_POST['password'] != ""){
-  // echo "<pre>";
-  // var_dump($_POST);
   $email = $_POST['email'];
   $query_checkEmail = "SELECT * FROM USERS WHERE `email_user` = '$email'";
   try {
     $stmt_checkEmail = $dbh->query($query_checkEmail)->rowCount();
-    // $ifExistMsg = urlencode("Pseudo already taken, choose another one!");
-    // header('Location: register.php?msg='.$ifExistMsg);
   }
   catch (PDOException $e) {
-      echo "Insertion failed: " . $e->getMessage();
+      echo "Request failed: " . $e->getMessage();
   }
   if ($stmt_checkEmail == 1){  
     $query_checkPass = "SELECT `pw_user` FROM USERS WHERE `email_user` = '$email'";
     try {
       $stmt_checkPass = $dbh->query($query_checkPass)->fetch(PDO::FETCH_ASSOC);
-      // $ifExistMsg = urlencode("Pseudo already taken, choose another one!");
-      // header('Location: register.php?msg='.$ifExistMsg);
-      // var_dump($stmt_checkPass);
-
     }
     catch (PDOException $e) {
-        echo "Insertion failed: " . $e->getMessage();
+        echo "Request failed: " . $e->getMessage();
     }
     if (password_verify($_POST['password'],$stmt_checkPass['pw_user']) == true){
-      // echo "<br>Mot de passe est bon!";
+      try {
+        $stmt = $dbh->query($query_checkEmail)->fetch(PDO::FETCH_ASSOC);
+      }
+      catch (PDOException $e) {
+          echo "Request failed: " . $e->getMessage();
+      }
       setCookie("CoookitoBlogo", time()+(60*60*24*360));
+      $userLogged = new User($stmt['prenom_user'], $stmt['nom_user'],$stmt['pseudo_user'],$stmt['email_user'], $stmt['role_user'],$stmt['pw_user']);
+      $userLogged->setId($stmt['id_user']);
+      $userLogged->setCreatedAt($stmt['created_at']);
+      $_SESSION['user'] = $userLogged;
       $_SESSION['logged'] = true;
+      $_SESSION['success'] = "You have logged in.";
       header("Location: ../../index.php");
-    }
-  } else {$_GET['msg'] = urlencode("Email does not exist!");}
-
-  // $password = $_POST['password'];
-  // if ($_POST['password'] == $password && $_POST['email'] == $email){
-  //     setCookie("Coookito", time()+(60*60*24*360));
-  //     header("Location: ../../index.php");
-  //     $_SESSION['logged'] = true;
-  // } 
+    } else {$_GET['msg'] = urlencode("You have entered an invalid email or password");}
+  } else {$_GET['msg'] = urlencode("You have entered an invalid email or password");} 
 }
 ?>
 <!DOCTYPE html>
@@ -109,16 +105,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['email'] != "" && $_POST['pass
                 >Posts</a
               >
             </li>
-            <li>
-              <a class="md:p-4 py-2 block hover:text-blue-400" href="#"
-                >Bookmarks</a
-              >
-            </li>
-            <!-- <li>
-              <a class="md:p-4 py-2 block hover:text-blue-400" href="#"
-                >Blog</a
-              >
-            </li> -->
             <li>
               <a
                 class="md:p-4 py-2 block hover:text-blue-400 text-blue-500"
@@ -290,10 +276,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['email'] != "" && $_POST['pass
             </div>
             <a href="#!" class="text-gray-800">Forgot password?</a>
           </div>
-          <P class="mt-6 text-center text-2xl pb-2 font-extrabold text-red-500">
+          <P class="mt-6 text-center text-1xl pb-2 font-extrabold text-red-500">
             <?php
                 if (isset($_GET['msg'])) {
-                  var_dump(urldecode($_GET['msg']));
+                  echo urldecode($_GET['msg']);
               }
             ?>
           </P>

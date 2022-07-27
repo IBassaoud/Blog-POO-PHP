@@ -1,8 +1,8 @@
 <?php
-session_start();
-
 require_once('../class/User.php');
 require_once('../../pdo.php');
+session_start();
+
 if ($_SERVER["REQUEST_METHOD"] == "POST"){
   if(!empty($_POST["pseudo"]) && !empty($_POST["email"]) && !empty($_POST["password"]) && !empty(["repeat_password"]) && !empty($_POST["first_name"]) && !empty($_POST["last_name"]) && !empty($_POST["role"])){
       if($_POST["password"] === $_POST["repeat_password"]){
@@ -12,25 +12,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
           try {
             $stmt_ifExist = $dbh->query($query_ifExist)->rowCount();
             if ($stmt_ifExist > 0){
-              $_GET['msg'] = urlencode("Pseudo already taken, choose another one!");
+              $_GET['msg'] = urlencode("User with such username already exists.");
             }
             // $ifExistMsg = urlencode("Pseudo already taken, choose another one!");
             // header('Location: register.php?msg='.$ifExistMsg);
           }
           catch (PDOException $e) {
-              echo "Insertion failed: " . $e->getMessage();
+              echo "Request failed: " . $e->getMessage();
           }
           $query_ifExist2 = "SELECT * FROM USERS WHERE `email_user` = '$email'";
           try {
             $stmt_ifExist2 = $dbh->query($query_ifExist2)->rowCount();
             if ($stmt_ifExist2 > 0){
-              $_GET['msg'] = urlencode("Email already taken, choose another one!");
+              $_GET['msg'] = urlencode("User with such email already exists.");
             }
             // $ifExistMsg = urlencode("Pseudo already taken, choose another one!");
             // header('Location: register.php?msg='.$ifExistMsg);
           }
           catch (PDOException $e) {
-              echo "Insertion failed: " . $e->getMessage();
+              echo "Request failed: " . $e->getMessage();
           }
 
           if ($stmt_ifExist == 0 && $stmt_ifExist2 == 0) {
@@ -41,21 +41,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             
             $newuser = new User($firstname, $lastname,$pseudo,$email, $role,$hashedpass);
             $newuser->saveUser();
-            $_SESSION['user'] = $newuser;
-          
-            // $insert_user_query = "INSERT INTO `USERS` (`pseudo_user`, `email_user`, `pw_user`, `prenom_user`, `nom_user`, `role_user`) VALUES('$pseudo', '$email', '$hashedpassword', '$firstname', '$lastname','$role')";
-            // try {
-            //   $sth = $dbh->query($insert_user_query);
-            //   $createdmsg = urlencode("&#9989 User created successfully!");
-            //   // header('Location: register.php?msgCreate='.$createdmsg);
-            //   $_GET['msgCreate'] = $createdmsg;
-            // }
-            // catch (PDOException $e) {
-            //   echo "Insertion failed: " . $e->getMessage();
-            // }
           } 
         } else {
-          $msg = urlencode("The two passwords are not matching!");
+          $msg = urlencode("The passwords do not match.");
           // header('Location: register.php?msg='.$msg);
           $_GET['msg'] = $msg;
           }   
@@ -128,16 +116,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
               >
             </li>
             <li>
-              <a class="md:p-4 py-2 block hover:text-blue-400" href="#"
-                >Bookmarks</a
-              >
-            </li>
-            <!-- <li>
-              <a class="md:p-4 py-2 block hover:text-blue-400" href="#"
-                >Blog</a
-              >
-            </li> -->
-            <li>
               <a
                 class="md:p-4 py-2 block hover:text-blue-400 text-blue-500"
                 href="http://localhost:8006/assets/php/login.php"
@@ -161,8 +139,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
 </h1>
 <form action="<?= $_SERVER['PHP_SELF']; ?>" method="POST">
   <div class="relative z-0 mb-6 w-full group">
-      <input type="text" name="pseudo" id="pseudo" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-gray-900 dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required="">
-      <label for="pseudo" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Pseudo</label>
+      <input type="text" name="pseudo" id="pseudo" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-gray-900 dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required="" value="Thea">
+      <label for="pseudo" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Username</label>
   </div>
   <div class="relative z-0 mb-6 w-full group">
       <input type="email" name="email" id="email" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-gray-900 dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required="">
@@ -187,35 +165,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
     </div>
     <input type="hidden" name="role" id="role" value="User">
   </div>
-  <!-- <div class="grid md:grid-cols-2 md:gap-6">
-    <div class="relative z-0 mb-6 w-full group">
-        <input type="tel" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" name="floating_phone" id="floating_phone" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-gray-900 dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required="">
-        <label for="floating_phone" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Phone number (123-456-7890)</label>
-    </div>
-    <div class="relative z-0 mb-6 w-full group">
-        <input type="text" name="floating_company" id="floating_company" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-gray-900 dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required="">
-        <label for="floating_company" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Company (Ex. Google)</label>
-    </div>
-  </div> -->
+  <div class="text-center lg:text-center">
   <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Submit</button>
-</form>
-<p class="mt-6 text-center text-4xl font-extrabold text-green-500">
+  <p class="text-sm font-semibold mt-2 pt-1 mb-0">
+              Already have an account?
+              <a
+                href="login.php"
+                class="text-green-600 hover:text-green-700 focus:text-green-700 transition duration-200 ease-in-out"
+                >Login here
+              </a>
+            </p>
+<p class="mt-6 text-center text-1xl font-extrabold text-green-500">
     <?php
-    echo $_SESSION['user'];
+    // print_r($_SESSION['user']);
     if (isset($_GET['msgCreate'])) {
         echo urldecode($_GET['msgCreate']);
     }
     if (isset($_GET['msg'])) {
-        echo "<span class='text-red-500'>" . urldecode($_GET['msg']). "</span>";
+        echo "<span class='mt-6 text-center text-red-500 text-1xl font-extrabold'>" . urldecode($_GET['msg']). "</span>";
     }
-    // if (isset($_GET['msgPseudo'])) {
-    //     echo "<span class='text-red-500'>" . urldecode($_GET['msgPseudo']). "</span>";
-    // }
-    // if (isset($_GET['msgEmail'])) {
-    //     echo "<span class='text-red-500'>" . urldecode($_GET['msgEmail']). "</span>";
-    // }
     ?>
-</p>
+</p>  
+</div>
+</form>
+
 </div>
 <script src="https://unpkg.com/flowbite@1.5.1/dist/flowbite.js"></script>
 </body>

@@ -1,8 +1,22 @@
 <?php 
 require_once('pdo.php');
+require_once('assets/class/User.php');
+session_start();
+
+// if ($_SESSION && $_SESSION['logged'] == true){
+//   echo "<pre>";
+//   print_r($_SESSION['user']);
+//   print_r($_SESSION['user']->getNom());
+//   echo " ";
+//   print_r($_SESSION['user']->getPrenom());
+//   $date = date_create($_SESSION['user']->getCreatedAt());
+//   echo "<br>";
+//   echo date_format($date, 'd-m-Y');
+//   // echo $date->format('d-m-Y H:i:s');
+//   echo "</pre>";
+// }
 
 $read_query_mainpage = "SELECT * FROM `USERS` ORDER BY `created_at` DESC LIMIT 5;";
-
 try {
     $sth = $dbh->query($read_query_mainpage)->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -22,7 +36,8 @@ catch (PDOException $e) {
     <title>The Blog</title>
 </head>
 <body>
-<header>
+<header> 
+  <!-- TODO FIX THE NAVBAR RESPONSIVE BUTTON MAAH FRIEND -->
      <nav
         class="
           flex flex-wrap
@@ -71,8 +86,16 @@ catch (PDOException $e) {
               >
             </li>
             <li>
-              <a class="md:p-4 py-2 block hover:text-blue-400" href="#"
+              <a class="md:p-4 py-2 block hover:text-blue-400" href="assets/php/posts.php"
                 >Posts</a
+              >
+            </li>
+            <?php
+            if ($_SESSION && $_SESSION['logged'] == true){
+            ?>
+            <li>
+              <a class="md:p-4 py-2 block hover:text-blue-400" href="assets/php/create_post.php"
+                >Create Post</a
               >
             </li>
             <li>
@@ -81,10 +104,15 @@ catch (PDOException $e) {
               >
             </li>
             <li>
-              <!-- <a class="md:p-4 py-2 block hover:text-blue-400" href="#"
-                >Blog</a
+              <a
+                class="md:p-4 py-2 block hover:text-blue-400 text-blue-500"
+                href="http://localhost:8006/assets/php/logout.php"
+                >Disconnect</a
               >
-            </li> -->
+            </li>
+            <?php
+            } else {
+            ?>
             <li>
               <a
                 class="md:p-4 py-2 block hover:text-blue-400 text-blue-500"
@@ -92,12 +120,16 @@ catch (PDOException $e) {
                 >Sign in</a
               >
             </li>
+            <li>
               <a
                 class="md:p-4 py-2 block hover:text-blue-400 text-blue-500"
                 href="http://localhost:8006/assets/php/register.php"
                 >Register</a
               >
             </li>
+            <?php
+            }
+            ?>
           </ul>
         </div>
     </nav>

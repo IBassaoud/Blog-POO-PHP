@@ -1,5 +1,4 @@
 <?php
-
 abstract class MainUser 
 {
     protected $id_user;
@@ -46,5 +45,93 @@ abstract class MainUser
           echo "Insertion failed request: " . $e->getMessage();
         }
     }
-    
+
+    public function getId() 
+    {
+      return $this->id_user;
+    }
+
+    public function setId($newId) 
+    {
+      $this->id_user = $newId;
+    }
+
+    public function getPrenom() 
+    {
+      return $this->prenom_user;
+    }
+
+    public function setPrenom($setPrenom) 
+    {
+      $this->prenom_user = $setPrenom;
+    }
+
+    public function getNom() 
+    {
+      return $this->nom_user;
+    }
+
+    public function setNom($setNom) 
+    {
+      $this->nom_user = $setNom;
+    }
+
+    public function getPseudo() 
+    {
+      return $this->pseudo_user;
+    }
+
+    public function setPseudo($setPseudo) 
+    {
+      $this->pseudo_user = $setPseudo;
+    }
+
+    public function getEmail() 
+    {
+      return $this->email_user;
+    }
+
+    public function setEmail($setEmail) 
+    {
+      $this->email_user = $setEmail;
+    }
+
+    public function getRole() 
+    {
+      return $this->role_user;
+    }
+
+    public function setRole($setRole) 
+    {
+      $this->role_user = $setRole;
+    }
+
+    public function getPass() 
+    {
+      return $this->pw_user;
+    }
+
+    public function setPass($setPass) 
+    {
+      $this->pw_user = $setPass;
+    }
+
+    public function getCreatedAt() 
+    {
+      return $this->created_at;
+    }
+    public function setCreatedAt($setCreated) 
+    {
+      $this->created_at = $setCreated;
+    }
+
+    public function getUpdatedAt() 
+    {
+      return $this->updated_at;
+    }
+
+    public function setUpdatedAt($setUpt) 
+    {
+      $this->updated_at = $setUpt;
+    }
 }
