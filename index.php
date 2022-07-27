@@ -3,7 +3,7 @@ require_once('pdo.php');
 require_once('assets/class/User.php');
 session_start();
 
-// if ($_SESSION && $_SESSION['logged'] == true){
+// if (isset($_SESSION['user'])){
 //   echo "<pre>";
 //   print_r($_SESSION['user']);
 //   print_r($_SESSION['user']->getNom());
@@ -14,9 +14,15 @@ session_start();
 //   echo date_format($date, 'd-m-Y');
 //   // echo $date->format('d-m-Y H:i:s');
 //   echo "</pre>";
+//   if ($_SESSION['user']->getIsLogged() == true){
+//     echo "</br>Logged in succesfully.";
+//   }
+//   if ($_SESSION['user']->getIsLogged() == false){
+//     echo "</br>This shouldn't work.";
+//   }
 // }
 
-$read_query_mainpage = "SELECT * FROM `USERS` ORDER BY `created_at` DESC LIMIT 5;";
+$read_query_mainpage = "SELECT * FROM `POSTS` ORDER BY `created_at` DESC LIMIT 5;";
 try {
     $sth = $dbh->query($read_query_mainpage)->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -91,7 +97,7 @@ catch (PDOException $e) {
               >
             </li>
             <?php
-            if ($_SESSION && $_SESSION['logged'] == true){
+            if (isset($_SESSION['user'])){
             ?>
             <li>
               <a class="md:p-4 py-2 block hover:text-blue-400" href="assets/php/create_post.php"
@@ -134,11 +140,53 @@ catch (PDOException $e) {
         </div>
     </nav>
   </header>    
-    <h1 class="text-3xl font-bold underline">Hello world!</h1>
     <?php
-    echo "<pre>";
-    var_dump($sth);
+    // echo "<pre>";
+    // var_dump($sth);
+    // echo "</pre>";
     ?>
+<!-- TODO changer le chemin de l'immage remplacer .. par assets -->
+<div class="pt-6 pb-12 bg-gray-300">  
+    <h2 class="text-center font-serif  uppercase text-4xl xl:text-5xl">Recent Articles</h2>
+    
+    <!-- container for all cards -->
+    <div class="container w-100 lg:w-4/5 mx-auto flex flex-col">
+      <!-- card -->
+      <div v-for="card in cards" class="flex flex-col md:flex-row overflow-hidden bg-white rounded-lg shadow-xl  mt-4 w-100 mx-2">
+        <!-- media -->
+        <div class="h-64 w-auto md:w-1/2">
+          <img class="inset-0 h-full w-full object-cover object-center" src="assets/img/uploads/IMG-62e14276b3f785.62118025.jpg" />
+        </div>
+        <!-- content -->
+        <div class="w-full py-4 px-6 text-gray-800 flex flex-col justify-between">
+          <h3 class="font-semibold text-lg leading-tight truncate">Titre de mon article</h3>
+          <p class="mt-2">
+            Description : Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi, architecto.
+          </p>
+          <p class="text-sm text-gray-700 uppercase tracking-wide font-semibold mt-2">
+            Auteur : Lorem          </p>
+        </div>
+      </div>
+      
+        <!-- card -->
+        <div v-for="card in cards" class="flex flex-col md:flex-row overflow-hidden bg-white rounded-lg shadow-xl  mt-4 w-100 mx-2">
+        <!-- media -->
+        <div class="h-64 w-auto md:w-1/2">
+          <img class="inset-0 h-full w-full object-cover object-center" src="assets/img/uploads/IMG-62e14276b3f785.62118025.jpg" />
+        </div>
+        <!-- content -->
+        <div class="w-full py-4 px-6 text-gray-800 flex flex-col justify-between">
+          <h3 class="font-semibold text-lg leading-tight truncate">Titre de mon article</h3>
+          <p class="mt-2">
+            Description : Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi, architecto.
+          </p>
+          <p class="text-sm text-gray-700 uppercase tracking-wide font-semibold mt-2">
+          Auteur : Lorem
+          </p>
+        </div>
+      </div><!--/ card--><!--/ card-->
+    </div>
+    </div>
 <script src="https://unpkg.com/flowbite@1.5.1/dist/flowbite.js"></script>
 
 </body>

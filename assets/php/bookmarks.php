@@ -2,6 +2,12 @@
 require_once('../../pdo.php');
 require_once('../class/User.php');
 session_start();
+// Check if the user is logged in, if not then redirect him to login page 
+if(!isset($_SESSION['user'])){
+    header("location: login.php"); 
+    exit;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -75,7 +81,7 @@ session_start();
               >
             </li> -->
             <?php
-            if ($_SESSION && $_SESSION['logged'] == true){
+            if (isset($_SESSION['user'])){
             ?>
             <li>
               <a class="md:p-4 py-2 block hover:text-blue-400" href="create_post.php"

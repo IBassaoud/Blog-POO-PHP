@@ -10,6 +10,7 @@ abstract class MainUser
     protected $pw_user; 
     protected $created_at;
     protected $updated_at;
+    protected $isLoggedYesNo;
 
     public function __construct($prenom, $nom,$pseudo,$email, $role,$pw) 
     {
@@ -34,16 +35,16 @@ abstract class MainUser
           echo "Connection failed dbh: " . $e->getMessage();
       }
 
-        $insert_user_query = "INSERT INTO `USERS` (`pseudo_user`, `email_user`, `pw_user`, `prenom_user`, `nom_user`, `role_user`) VALUES('$this->pseudo_user', '$this->email_user', '$this->pw_user', '$this->prenom_user', '$this->nom_user','$this->role_user')";
-        try {
-          $sth = $dbh->query($insert_user_query);
-          $createdmsg = urlencode("&#9989 User created successfully!");
-          // header('Location: register.php?msgCreate='.$createdmsg);
-          $_GET['msgCreate'] = $createdmsg;
-        }
-        catch (PDOException $e) {
-          echo "Insertion failed request: " . $e->getMessage();
-        }
+      $insert_user_query = "INSERT INTO `USERS` (`pseudo_user`, `email_user`, `pw_user`, `prenom_user`, `nom_user`, `role_user`) VALUES('$this->pseudo_user', '$this->email_user', '$this->pw_user', '$this->prenom_user', '$this->nom_user','$this->role_user')";
+      try {
+        $sth = $dbh->query($insert_user_query);
+        $createdmsg = urlencode("&#9989 User created successfully!");
+        // header('Location: register.php?msgCreate='.$createdmsg);
+        $_GET['msgCreate'] = $createdmsg;
+      }
+      catch (PDOException $e) {
+        echo "Insertion failed request: " . $e->getMessage();
+      }
     }
 
     public function getId() 
@@ -133,5 +134,15 @@ abstract class MainUser
     public function setUpdatedAt($setUpt) 
     {
       $this->updated_at = $setUpt;
+    }
+
+    public function getIsLogged() 
+    {
+      return $this->isLoggedYesNo;
+    }
+
+    public function setIsLogged($loggedYesNo) 
+    {
+      $this->isLoggedYesNo = $loggedYesNo;
     }
 }

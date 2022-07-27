@@ -1,9 +1,71 @@
 <?php
+require_once("../../pdo.php");
+require_once("../class/User.php");
 session_start();
+
 // Check if the user is logged in, if not then redirect him to login page 
-if(!isset($_SESSION["logged"]) || $_SESSION["logged"] !== true){
+if(!isset($_SESSION['user'])){
     header("location: login.php"); 
     exit;
+}
+if ($_SERVER["REQUEST_METHOD"] == "POST"){
+    // echo "<pre>";
+    // var_dump($_POST);
+    // print_r($_FILES);
+    $img_name = $_FILES['image_post']['name'];
+    $img_size = $_FILES['image_post']['size'];
+    $tmp_name = $_FILES['image_post']['tmp_name'];
+    $imgerror = $_FILES['image_post']['error'];
+
+    define('MB', 1048576);
+    if ($imgerror === 0){
+        if ($img_size > 10*MB){
+            $msg = urlencode("Sorry bruh, your file is too large.");
+            $_GET['msgError'] = $msg;
+        } else {
+            $img_extension = pathinfo($img_name, PATHINFO_EXTENSION);
+            $img_extension_lc = strtolower($img_extension);
+
+            $allowed_extensions = ['jpg','jpeg','png'];
+
+            if (in_array($img_extension_lc,$allowed_extensions)){
+                $new_img_name = uniqid("IMG-", true).'.'.$img_extension_lc;
+                $img_upload_path = '../img/uploads/'.$new_img_name;
+                move_uploaded_file($tmp_name, $img_upload_path);
+
+            } else {
+                $msg = urlencode("Sorry bruh, your cant upload files of this type.");
+                $_GET['msgError'] = $msg;
+            }
+        }
+    } else {
+        $msg = urlencode("Unknown error occured, enven I don't know WTF YOU DID!.");
+        $_GET['msgError'] = $msg;
+    }
+
+    if(!empty($_POST["title_post"]) && !empty($_POST["body_post"])){
+        $id_user = $_SESSION['user']->getId();
+        $title = $_POST['title_post'];
+        $description = $_POST['description_post'];
+        $content = $_POST['body_post'];
+        // title_post description_post image_post content_post
+        if (!isset($_GET['msgError'])){
+            $insert_new_post = "INSERT INTO POSTS (`fk_id_user`,`title_post`,`image_post`,`description_post`,`body_post`) VALUES ('$id_user','$title','$img_upload_path','$description','$content')"; 
+        try {
+          $stmt_newPost = $dbh->query($insert_new_post);
+          $msg = urlencode("Post submitted succesfully.");
+          $_GET['msg'] = $msg;
+        }
+        catch (PDOException $e) {
+            echo "Creation post failed: " . $e->getMessage();
+        }
+        }
+      } else {
+        $msg = urlencode("In order to submit a Post you must provide a title and a text body.");
+        // header('Location: register.php?msg='.$msg);
+        $_GET['msgError'] = $msg;
+        }   
+
 }
 ?>
 <!DOCTYPE html>
@@ -77,7 +139,7 @@ if(!isset($_SESSION["logged"]) || $_SESSION["logged"] !== true){
               >
             </li> -->
             <?php
-            if ($_SESSION && $_SESSION['logged'] == true){
+            if (isset($_SESSION['user'])){
             ?>
             <li>
               <a class="md:p-4 py-2 block hover:text-blue-400" href="create_post.php"
@@ -125,24 +187,37 @@ if(!isset($_SESSION["logged"]) || $_SESSION["logged"] !== true){
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-6 bg-white border-b border-gray-200">
-                <form method="POST" action="create_post.php">
+                <p class="mt-6 text-center text-1xl font-extrabold text-green-500">
+                <?php
+                if (isset($_GET['msg'])) {
+                    echo urldecode($_GET['msg']);
+                }
+                if (isset($_GET['msgError'])) {
+                    echo "<span class='mt-6 text-center text-red-500 text-1xl font-extrabold'>" . urldecode($_GET['msgError']). "</span>";
+                }
+                ?>
+                <form method="POST" action="<?= $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
                     <div class="mb-4">
                         <label class="text-xl text-gray-600">Title <span class="text-red-500">*</span></label></br>
-                        <input type="text" class="border-2 border-gray-300 p-2 w-full" name="title" id="title" required>
+                        <input type="text" class="border-2 border-gray-300 p-2 w-full" name="title_post" id="title" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="text-xl text-gray-600">Description</label></br>
+                        <input type="text" class="border-2 border-gray-300 p-2 w-full" name="description_post" id="description" placeholder="(Optional)">
                     </div>
 
                     <div class="mb-4">
-                        <label class="text-xl text-gray-600">Description</label></br>
-                        <input type="text" class="border-2 border-gray-300 p-2 w-full" name="description" id="description" placeholder="(Optional)">
+                        <label class="text-xl text-gray-600">Image</label></br>
+                        <input type="file" class="border-2 border-gray-300 py-2 w-full pl-6" name="image_post" id="image_post" placeholder="(Optional)">
                     </div>
 
                     <div class="mb-8">
                         <label class="text-xl text-gray-600">Content <span class="text-red-500">*</span></label></br>
-                        <textarea name="content" class="border-2 border-gray-500">
+                        <textarea name="body_post" class="border-2 border-gray-500">
                             
                         </textarea>
                     </div>
-                    <button role="submit" class="p-3 bg-blue-500 text-white hover:bg-blue-400" required>Submit</button>
+                    <button type="submit" class="p-3 bg-blue-500 text-white hover:bg-blue-400">Submit</button>
                 </form>
             </div>
         </div>
@@ -151,7 +226,7 @@ if(!isset($_SESSION["logged"]) || $_SESSION["logged"] !== true){
 
 <script src="https://cdn.ckeditor.com/4.16.0/standard/ckeditor.js"></script>
 <script>
-    CKEDITOR.replace( 'content' );
+    CKEDITOR.replace( 'body_post' );
 </script>
 <script src="https://unpkg.com/flowbite@1.5.1/dist/flowbite.js"></script>
 </body>

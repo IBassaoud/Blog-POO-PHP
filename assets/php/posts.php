@@ -2,7 +2,21 @@
 require_once('../../pdo.php');
 require_once('../class/User.php');
 session_start();
+
+$read_query_posts = "SELECT * FROM `POSTS`;";
+try {
+    $myposts = $dbh->query($read_query_posts)->fetch(PDO::FETCH_ASSOC);
+}
+catch (PDOException $e) {
+    echo "Read failed: " . $e->getMessage();
+}
+
+// for ($i=0;$i<sizeof($myposts);$i++) {
+
+// }
+// print_r($myposts);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -75,7 +89,7 @@ session_start();
               >
             </li> -->
             <?php
-            if ($_SESSION && $_SESSION['logged'] == true){
+            if (isset($_SESSION['user'])){
             ?>
             <li>
               <a class="md:p-4 py-2 block hover:text-blue-400" href="create_post.php"
@@ -118,7 +132,50 @@ session_start();
         </div>
     </nav>
   </header>    
-    <h1 class="text-3xl font-bold underline">All POSTS HERE!</h1>
+    <!-- <h1 class="text-3xl font-bold underline">All POSTS HERE!</h1> -->
+    <div class="pt-6 pb-12 bg-gray-300">  
+    <h2 class="text-center font-serif  uppercase text-4xl xl:text-5xl">Articles</h2>
+    
+    <!-- container for all cards -->
+    <div class="container w-100 lg:w-4/5 mx-auto flex flex-col">
+      <!-- card -->
+      <div v-for="card in cards" class="flex flex-col md:flex-row overflow-hidden bg-white rounded-lg shadow-xl  mt-4 w-100 mx-2">
+        <!-- media -->
+        <div class="h-64 w-auto md:w-1/2">
+          <img class="inset-0 h-full w-full object-cover object-center" src="../img/uploads/IMG-62e14276b3f785.62118025.jpg" />
+        </div>
+        <!-- content -->
+        <div class="w-full py-4 px-6 text-gray-800 flex flex-col justify-between">
+          <h3 class="font-semibold text-lg leading-tight truncate">Titre de mon article</h3>
+          <p class="mt-2">
+            Description : Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi, architecto.
+          </p>
+          <p class="text-sm text-gray-700 uppercase tracking-wide font-semibold mt-2">
+            Auteur : Lorem          </p>
+        </div>
+      </div>
+      
+            <!-- card -->
+            <div v-for="card in cards" class="flex flex-col md:flex-row overflow-hidden bg-white rounded-lg shadow-xl  mt-4 w-100 mx-2">
+        <!-- media -->
+        <div class="h-64 w-auto md:w-1/2">
+          <img class="inset-0 h-full w-full object-cover object-center" src="../img/uploads/IMG-62e14276b3f785.62118025.jpg" />
+        </div>
+        <!-- content -->
+        <div class="w-full py-4 px-6 text-gray-800 flex flex-col justify-between">
+          <h3 class="font-semibold text-lg leading-tight truncate">Titre de mon article</h3>
+          <p class="mt-2">
+            Description : Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi, architecto.
+          </p>
+          <p class="text-sm text-gray-700 uppercase tracking-wide font-semibold mt-2">
+          Auteur : Lorem
+          </p>
+        </div>
+      </div><!--/ card--><!--/ card-->
+    </div>
+    </div><!--/ flex-->
+ 
+
 
 
 <script src="https://unpkg.com/flowbite@1.5.1/dist/flowbite.js"></script>

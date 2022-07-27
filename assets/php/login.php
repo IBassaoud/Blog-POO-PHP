@@ -21,6 +21,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['email'] != "" && $_POST['pass
         echo "Request failed: " . $e->getMessage();
     }
     if (password_verify($_POST['password'],$stmt_checkPass['pw_user']) == true){
+      $insert_logYes = "UPDATE `USERS` SET `is_logged_user` = b'1' WHERE `email_user` = '$email'";
+      try {
+        $stmt2 = $dbh->query($insert_logYes);
+      }
+      catch (PDOException $e) {
+          echo "Update failed: " . $e->getMessage();
+      }
+
       try {
         $stmt = $dbh->query($query_checkEmail)->fetch(PDO::FETCH_ASSOC);
       }
@@ -31,9 +39,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['email'] != "" && $_POST['pass
       $userLogged = new User($stmt['prenom_user'], $stmt['nom_user'],$stmt['pseudo_user'],$stmt['email_user'], $stmt['role_user'],$stmt['pw_user']);
       $userLogged->setId($stmt['id_user']);
       $userLogged->setCreatedAt($stmt['created_at']);
+      $userLogged->setIsLogged($stmt['is_logged_user']);
       $_SESSION['user'] = $userLogged;
-      $_SESSION['logged'] = true;
-      $_SESSION['success'] = "You have logged in.";
+      // $_SESSION['success'] = "You have logged in.";
       header("Location: ../../index.php");
     } else {$_GET['msg'] = urlencode("You have entered an invalid email or password");}
   } else {$_GET['msg'] = urlencode("You have entered an invalid email or password");} 
