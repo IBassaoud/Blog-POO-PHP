@@ -19,24 +19,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
 
     define('MB', 1048576);
     if ($imgerror === 0){
-        if ($img_size > 10*MB){
-            $msg = urlencode("Sorry bruh, your file is too large.");
-            $_GET['msgError'] = $msg;
-        } else {
-            $img_extension = pathinfo($img_name, PATHINFO_EXTENSION);
-            $img_extension_lc = strtolower($img_extension);
+      if ($img_size > 10*MB){
+          $msg = urlencode("Sorry bruh, your file is too large.");
+          $_GET['msgError'] = $msg;
+      } else {
+          $img_extension = pathinfo($img_name, PATHINFO_EXTENSION);
+          $img_extension_lc = strtolower($img_extension);
 
-            $allowed_extensions = ['jpg','jpeg','png','webp','gif'];
+          $allowed_extensions = ['jpg','jpeg','png','webp','gif'];
 
-            if (in_array($img_extension_lc,$allowed_extensions)){
-                $new_img_name = uniqid("IMG-", true).'.'.$img_extension_lc;
-                $img_upload_path = '../img/uploads/'.$new_img_name;
-                move_uploaded_file($tmp_name, $img_upload_path);
+          if (in_array($img_extension_lc,$allowed_extensions)){
+              $new_img_name = uniqid("IMG-", true).'.'.$img_extension_lc;
+              $img_upload_path = '../img/uploads/'.$new_img_name;
+              move_uploaded_file($tmp_name, $img_upload_path);
 
-            } else {
-                $msg = urlencode("Sorry bruh, your cant upload files of this type.");
-                $_GET['msgError'] = $msg;
-            }
+          } else {
+              $msg = urlencode("Sorry bruh, your cant upload files of this type.");
+              $_GET['msgError'] = $msg;
+          }
         }
     } else {
         $msg = urlencode("Unknown error occured, enven I don't know WTF YOU DID!.<br>");
@@ -47,10 +47,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         $id_user = $_SESSION['user']->getId();
         $title = $_POST['title_post'];
         $description = $_POST['description_post'];
-        $content = $_POST['body_post'];
-        // title_post description_post image_post content_post
+        $content = $_POST['body_post'];        
+        $text = $description;
+        $result = str_replace("'","&#39",$text);
+        $description = $result;
+
         if (!isset($_GET['msgError'])){
-            $insert_new_post = "INSERT INTO POSTS (`fk_id_user`,`title_post`,`image_post`,`description_post`,`body_post`) VALUES ('$id_user','$title','$img_upload_path','$description','$content')"; 
+            $insert_new_post = "INSERT INTO POSTS (`fk_id_user`,`title_post`,`image_post`,`description_post`,`body_post`) VALUES ('".$id_user."','".$title."','".$img_upload_path."','".$description."','".$content."')"; 
         try {
           $stmt_newPost = $dbh->query($insert_new_post);
           $msg = urlencode("Post submitted succesfully.");
