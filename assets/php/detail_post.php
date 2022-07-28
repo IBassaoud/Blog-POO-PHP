@@ -4,25 +4,41 @@ require_once('../class/User.php');
 require_once('../class/Post.php');
 session_start();
 // print_r($_POST);
-$read_query_allposts = "SELECT * FROM `POSTS` ORDER BY `created_at` DESC;";
+if (isset($_POST['id_post'])){
+  $idpost = $_POST['id_post'];
+}
+$query_post = "SELECT * FROM `POSTS` WHERE `id_post` = '$idpost';";
 try {
-    $sth = $dbh->query($read_query_allposts)->fetchAll(PDO::FETCH_ASSOC);
+    $sth = $dbh->query($query_post)->fetchAll(PDO::FETCH_ASSOC);
 }
 catch (PDOException $e) {
     echo "Read failed: " . $e->getMessage();
 }
-//BOUCLE qui instancie via la classe Post chaque posts retourner dans ma requête vers la BDD
-for ($i=0;$i<sizeof($sth);$i++){
-    $GLOBALS['allposts'][$i] = new Post($sth[$i]['id_post'],$sth[$i]['fk_id_user'],$sth[$i]['title_post'],$sth[$i]['description_post'],$sth[$i]['views_post'],$sth[$i]['image_post'],$sth[$i]['body_post'],$sth[$i]['published_post'],$sth[$i]['created_at']);
-}
-$length = sizeof($GLOBALS['allposts']);
-for ($i=0;$i<$length;$i++){
-    $date = date_create($GLOBALS['allposts'][$i]->getcreated_at());
-    $GLOBALS['allposts'][$i]->setcreated_at(date_format($date, 'd-m-Y'));
-  }
+
+//Instanciation via la classe Post à l'aide de l'ID passé par la méthode post
+$GLOBALS['post'][0] = new Post(
+  $sth[0]['id_post'],
+  $sth[0]['fk_id_user'],
+  $sth[0]['title_post'],
+  $sth[0]['description_post'],
+  $sth[0]['views_post'],
+  $sth[0]['image_post'],
+  $sth[0]['body_post'],
+  $sth[0]['published_post'],
+  $sth[0]['created_at']);
+$date = date_create($GLOBALS['post'][0]->getcreated_at());
+$GLOBALS['post'][0]->setcreated_at(date_format($date, 'd-m-Y'));
 // TODO - look for a template in order to display the full detail of the post 
 // TODO - Might want to POST id_user & id_post
 // TODO - Take care of the comment section dude
+$myuser = $GLOBALS['post'][0]->getfk_id_user();
+$query_user = "SELECT * FROM `USERS` WHERE `id_user` = '$myuser'";
+try {
+    $stmt_user = $dbh->query($query_user)->fetchAll(PDO::FETCH_ASSOC);
+}
+catch (PDOException $e) {
+    echo "Read failed: " . $e->getMessage();
+}
 ?>
 
 <!DOCTYPE html>
@@ -140,11 +156,35 @@ for ($i=0;$i<$length;$i++){
     </nav>
 </header>    
     <!-- <h1 class="text-3xl font-bold underline">All POSTS HERE!</h1> -->
-    <div class="pt-6 pb-12 bg-gray-300">  
-    <h2 class="text-center font-serif  uppercase text-4xl xl:text-5xl">Articles</h2>
-    
+    <div class="pt-6 pb-6 bg-gray-300">  
+    <h2 class="text-center font-serif  uppercase text-4xl xl:text-5xl"><?= $GLOBALS['post'][0]->gettitle_post(); ?></h2>
+    </div>
     <!-- container for all cards -->
-    <div class="container w-100 lg:w-4/5 mx-auto flex flex-col">
+    <div class="container w-100 lg:w-4/5 mx-auto flex">
+      <div class="py-16 bg-white">  
+        <div class="container m-auto px-6 text-gray-600 md:px-12 xl:px-6">
+            <div class="space-y-6 md:space-y-0 md:flex md:gap-6 lg:items-center lg:gap-12">
+              <div class="md:5/12 lg:w-5/12">
+                <img src="<?= $GLOBALS['post'][0]->getimage_post(); ?>" alt="image" loading="lazy" width="" height="">
+              </div>
+              <div class="md:7/12 lg:w-6/12">
+                <h2 class="text-1xl text-gray-900 font-bold md:text-1xl">
+                  <?= 'Postée par : '.$stmt_user[0]['prenom_user'].' '.$stmt_user[0]['nom_user'];
+                  echo "<br>". "Le ". $GLOBALS['post'][0]->getcreated_at();
+                  ?>
+                </h2>
+                <p class="mt-6 text-gray-600">
+                  <?= $GLOBALS['post'][0]->getdescription_post(); ?>
+                </p>
+                <p class="mt-4 text-gray-600">
+                <?= "<u class='text-1xl font-bold'>Synopsis</u>  : <br>" .
+                $GLOBALS['post'][0]->getbody_post(); 
+                ?>
+              </p>
+              </div>
+            </div>
+        </div>
+      </div>
         <?php
         // for ($i=0;$i<$length;$i++){
         //     $myuser = $GLOBALS['allposts'][$i]->getfk_id_user();
@@ -178,7 +218,7 @@ for ($i=0;$i<$length;$i++){
         // }
         ?>
     </div>
-    </div><!--/ flex-->
+ <!--/ flex-->
  
 
 
