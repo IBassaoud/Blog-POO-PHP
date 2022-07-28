@@ -4,14 +4,18 @@ require_once("../class/User.php");
 session_start();
 if (isset($_SESSION['user'])){
   $userLoggedYesNo = $_SESSION['user']->getIsLogged();
+  $id_user = $_SESSION['user']->getId();
+
 }
 
 if (isset($_SESSION['admin'])){
   $adminLoggedYesNo = $_SESSION['admin']->getIsLogged();
+  $id_user = $_SESSION['admin']->getId();
 }
 
 if (isset($_SESSION['moderator'])){
   $moderatorLoggedYesNo = $_SESSION['moderator']->getIsLogged();
+  $id_user = $_SESSION['moderator']->getId();
 }
 // print_r($_SESSION);
 // Check if the user is logged in, if not then redirect him to login page 
@@ -49,16 +53,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
           $img_extension_lc = strtolower($img_extension);
 
           $allowed_extensions = ['jpg','jpeg','png','webp','gif'];
-
-          if (in_array($img_extension_lc,$allowed_extensions)){
-              $new_img_name = uniqid("IMG-", true).'.'.$img_extension_lc;
-              $img_upload_path = '../img/uploads/'.$new_img_name;
-              move_uploaded_file($tmp_name, $img_upload_path);
-
-          } else {
-              $msg = urlencode("Sorry bruh, your cant upload files of this type.");
-              $_GET['msgError'] = $msg;
-          }
         }
     } else {
         $msg = urlencode("Unknown error occured, enven I don't know WTF YOU DID!.<br>");
@@ -66,7 +60,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
     }
 
     if(!empty($_POST["title_post"]) && !empty($_POST["body_post"])){
-        $id_user = $_SESSION['user']->getId();
         $title = $_POST['title_post'];
         $description = $_POST['description_post'];
         $content = $_POST['body_post'];        
@@ -75,6 +68,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         $description = $result;
 
         if (!isset($_GET['msgError'])){
+          if (in_array($img_extension_lc,$allowed_extensions)){
+            $new_img_name = uniqid("IMG-", true).'.'.$img_extension_lc;
+            $img_upload_path = '../img/uploads/'.$new_img_name;
+            move_uploaded_file($tmp_name, $img_upload_path);
+
+        } else {
+            $msg = urlencode("Sorry bruh, your cant upload files of this type.");
+            $_GET['msgError'] = $msg;
+        }
+        
             $insert_new_post = "INSERT INTO POSTS (`fk_id_user`,`title_post`,`image_post`,`description_post`,`body_post`) VALUES ('".$id_user."','".$title."','".$img_upload_path."','".$description."','".$content."')"; 
         try {
           $stmt_newPost = $dbh->query($insert_new_post);
