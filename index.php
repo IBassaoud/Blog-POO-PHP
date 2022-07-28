@@ -11,10 +11,25 @@ try {
 catch (PDOException $e) {
     echo "Read failed: " . $e->getMessage();
 }
+
 //BOUCLE qui instancie via la classe Post chaque posts retourner dans ma requête vers la BDD
 for ($i=0;$i<sizeof($sth);$i++){
-  $GLOBALS['allposts'][$i] = new Post($sth[$i]['id_post'],$sth[$i]['fk_id_user'],$sth[$i]['title_post'],$sth[$i]['description_post'],$sth[$i]['views_post'],$sth[$i]['image_post'],$sth[$i]['body_post'],$sth[$i]['published_post'],$sth[$i]['created_at']);
+  $GLOBALS['allposts'][$i] = new Post
+  (
+    $sth[$i]['id_post'],
+    $sth[$i]['fk_id_user'],
+    $sth[$i]['title_post'],
+    $sth[$i]['description_post'],
+    $sth[$i]['views_post'],
+    $sth[$i]['image_post'],
+    $sth[$i]['body_post'],
+    $sth[$i]['published_post'],
+    $sth[$i]['created_at']
+  );
 }
+// echo "<pre>";
+// print_r($GLOBALS['allposts']);
+// echo "</pre>";
 $length = sizeof($GLOBALS['allposts']);
 for ($i=0;$i<$length;$i++){
   //replace the '..' by 'assets' on my image path
@@ -58,7 +73,7 @@ for ($i=0;$i<$length;$i++){
             if (isset($_SESSION['admin'])){
             ?>
             <li>
-              <a href="#" class="block py-2 pr-4 pl-3 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-black dark:hover:bg-blue-700 dark:hover:text-white md:dark:hover:bg-transparent">Dashboard</a>
+              <a href="http://localhost:8006/assets/php/dashboard.php" class="block py-2 pr-4 pl-3 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-black dark:hover:bg-blue-700 dark:hover:text-white md:dark:hover:bg-transparent">Dashboard</a>
             </li>
             <?php
             }
@@ -95,12 +110,7 @@ for ($i=0;$i<$length;$i++){
     </div>
   </nav>
 </header>
-    <?php
-    // echo "<pre>";
-    // var_dump($sth);
-    // echo "</pre>";
-    ?>
-<!-- TODO changer le chemin de l'immage remplacer .. par assets -->
+<!-- TODO setting the correct timezone on the DB server -->
 <div class="pt-6 pb-12 bg-gray-300">  
     <h2 class="text-center font-serif  uppercase text-4xl xl:text-5xl">Recent Articles</h2>
     <!-- container for all cards -->
