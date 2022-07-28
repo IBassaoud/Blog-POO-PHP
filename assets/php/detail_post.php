@@ -15,7 +15,8 @@ catch (PDOException $e) {
 }
 
 //Instanciation via la classe Post à l'aide de l'ID passé par la méthode post
-$GLOBALS['post'][0] = new Post(
+$GLOBALS['post'][0] = new Post
+(
 $sth[0]['id_post'],
 $sth[0]['fk_id_user'],
 $sth[0]['title_post'],
@@ -24,25 +25,36 @@ $sth[0]['views_post'],
 $sth[0]['image_post'],
 $sth[0]['body_post'],
 $sth[0]['published_post'],
-$sth[0]['created_at']);
+$sth[0]['created_at']
+);
 $date = date_create($GLOBALS['post'][0]->getcreated_at());
-$GLOBALS['post'][0]->setcreated_at(date_format($date, 'd-m-Y'));
-// TODO - look for a template in order to display the full detail of the post 
-// TODO - Might want to POST id_user & id_post
-// TODO - Take care of the comment section dude
-$myuser = $GLOBALS['post'][0]->getfk_id_user();
-$query_user = "SELECT * FROM `USERS` WHERE `id_user` = '$myuser'";
+$GLOBALS['post'][0]->setcreated_at(date_format($date, 'd-m-Y à H:i.'));
+
+$author = $GLOBALS['post'][0]->getfk_id_user();
+$query_author = "SELECT * FROM `USERS` WHERE `id_user` = '$author'";
 try {
-    $stmt_user = $dbh->query($query_user)->fetchAll(PDO::FETCH_ASSOC);
+    $stmt_author = $dbh->query($query_author)->fetchAll(PDO::FETCH_ASSOC);
 }
 catch (PDOException $e) {
     echo "Read failed: " . $e->getMessage();
 }
+
+$authorData = new User
+(
+  $stmt_author[0]['prenom_user'],
+  $stmt_author[0]['nom_user'],
+  $stmt_author[0]['pseudo_user'],
+  $stmt_author[0]['email_user'],
+  $stmt_author[0]['role_user'],
+  $stmt_author[0]['pw_user']
+);
+$GLOBALS['author'] = $authorData;
+// print_r($authorData);
 } else {
   header("location: http://localhost:8006/"); 
   exit;
 }
-
+// TODO - Take care of the comment section dude
 ?>
 
 <!DOCTYPE html>
@@ -160,7 +172,7 @@ catch (PDOException $e) {
     </nav>
 </header>  
 <?
-$GLOBALS['post'][0]->showDetailsPost($stmt_user[0]['prenom_user'],$stmt_user[0]['nom_user']);
+$GLOBALS['post'][0]->showDetailsPost($GLOBALS['author']->getPrenom(),$GLOBALS['author']->getNom());
 ?>
 <script src="https://unpkg.com/flowbite@1.5.1/dist/flowbite.js"></script>
 </body>
