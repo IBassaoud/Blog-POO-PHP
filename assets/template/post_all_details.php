@@ -13,7 +13,7 @@ echo '<div class="pt-6 pb-6 bg-gray-300">
           </div>
           <div class="md:7/12 lg:w-6/12">
             <h2 class="text-1xl text-gray-900 font-bold md:text-1xl">
-               Postée par : '. $prenomAuteur .' '. $nomAuteur.'
+               Publié par : '. $prenomAuteur .' '. $nomAuteur.'
               <br>Le '. $this->created_at .'
               
             </h2>

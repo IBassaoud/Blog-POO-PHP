@@ -15,7 +15,7 @@ echo '      <!-- card -->
       '.$this->getdescription_post().'
     </p>
     <p class="text-sm text-gray-700 uppercase tracking-wide font-semibold mt-2">
-    Postée le '.$this->getcreated_at().' par '.$prenomAuteur.' '.$nomAuteur.'          
+    Publié le '.$this->getcreated_at().' par '.$prenomAuteur.' '.$nomAuteur.'          
     </p>
   </div>
 </div>
