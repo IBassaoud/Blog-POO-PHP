@@ -28,15 +28,29 @@ namespace App\models
             // On boucle pour éclater le tableau
             foreach ($criteres as $champ => $valeur){
                 // SELECT * FROM USERS WHERE `status_job` = ? AND `age` = 0 
-                // bindvalue(1,valeur)
                 $champs[] = "$champ = ?";
                 $valeurs[] = $valeur;
             }
             // On transforme le tableau "champs" en une chaine de caractères séparé par des AND
-            $list_champs = implode(' AND ', $champs); 
-
+            $list_champs = implode(' AND ', $champs);
             // On execute la requête
             return $this->query_DB("SELECT * FROM " . $this->table . " WHERE " . $list_champs, $valeurs)->fetchAll();
+
+        }
+        public function findOrderbyLimit(array $order, int $limit)
+        {
+            $orderby = key($order); 
+            $orderColumn = $order[$orderby];
+
+            // On execute la requête
+            // SELECT * FROM `POSTS` ORDER BY `created_at` DESC LIMIT 5
+            if (!empty($order)){
+                if ($limit != null){
+                    return $this->query_DB("SELECT * FROM " . $this->table . " ORDER BY " . $orderColumn . " " . $orderby . " LIMIT " . $limit)->fetchAll();
+                } else {
+                    return $this->query_DB("SELECT * FROM " . $this->table . " ORDER BY " . $orderColumn . " " . $orderby)->fetchAll();
+                }
+            }
         }
 
         public function find(int $id, string $tab)
@@ -78,10 +92,9 @@ namespace App\models
         {
             $champs = [];
             $valeurs = [];
-            
+            $name_column = "`$this->table`.id_" . rtrim(strtolower($this->table),"s");
             // On boucle pour éclater le tableau
             foreach ($model as $champ => $valeur){
-                $name_column = "`$this->table`.id_" . rtrim(strtolower($this->table),"s");
                 // UPDATE USERS SET `name` = ?`username` = ?`email` = ?`password` = ?`title` = ?`aboutme` = ?`city` = ?`country` = ?`facebook` = ?`twitter` = ?`instagram` = ?`youtube` = ?`linkedin` = ?`github` = ?`slogan` = ?`birthday` = ?`website` = ?`phone` = ?`age` = ?`degree` = ?`status_job` = ?`certification` = ? WHERE `id` = ?
                 if (isset($valeur) && $champ != $name_column && $champ != 'db' && $champ != 'table' && $champ != 'created_at'){
                     $champs[] = "`$champ` = ?"; 

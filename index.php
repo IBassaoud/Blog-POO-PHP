@@ -5,6 +5,10 @@ use App\models\PostsModel;
 require_once('Autoloader.php');
 Autoloader::register();
 
+define('WEBROOT', str_replace('index.php','',$_SERVER['PHP_SELF']));
+// On définit une constante contenant le dossier racine du projet
+define('ROOT', str_replace('index.php','',$_SERVER['SCRIPT_FILENAME']));
+
 $modelPost = new PostsModel;
 $newPost = $modelPost
             ->setFk_id_user(6)
@@ -47,10 +51,26 @@ $modelUser = new UsersModel;
 // $modelUser->create($newUser);
 $donneesUser = [
   "pw_user" => password_hash("zizou123", PASSWORD_ARGON2I),
-  "is_logged_user" => 1
+  "is_logged_user" => 0
 ];
+
+$myUser = $modelUser->findBy(
+  ["id_user" => 3,
+  "role_user" => "User"]
+  // ["DESC" => "`created_at`"],
+  // 5
+);
+
+$myUser = $modelUser->findOrderbyLimit(
+    ["ASC" => "`created_at`"],
+    2
+);
+echo "<pre>";
+var_dump($myUser);
+echo "</pre>";
 // $updateUser = $modelUser->hydrate($donneesUser);
 // $modelUser->update(8,$updateUser);
+exit;
 // $modelUser->delete(9);
 // $allUsers = $modelUser->findAll();
 // echo "<pre>";
