@@ -6,7 +6,7 @@ session_start();
 if (isset($_SESSION['user'])){
   $email = $_SESSION['user']->getEmail();
   if(session_destroy()) { 
-  $insert_logNo = "UPDATE `USERS` SET `is_logged_user` = b'0' WHERE `email_user` = '$email'";
+  $insert_logNo = "UPDATE `USERS` SET `is_logged_user` = 0 WHERE `email_user` = '$email'";
   try {
     $stmt = $dbh->query($insert_logNo);
   }
@@ -21,7 +21,7 @@ if (isset($_SESSION['user'])){
 if (isset($_SESSION['admin'])){
   $email = $_SESSION['admin']->getEmail();
   if(session_destroy()) { 
-  $insert_logNo = "UPDATE `USERS` SET `is_logged_user` = b'0' WHERE `email_user` = '$email'";
+  $insert_logNo = "UPDATE `USERS` SET `is_logged_user` = 0 WHERE `email_user` = '$email'";
   try {
     $stmt = $dbh->query($insert_logNo);
   }
@@ -36,7 +36,7 @@ if (isset($_SESSION['admin'])){
 if (isset($_SESSION['moderator'])){
   $email = $_SESSION['moderator']->getEmail();
   if(session_destroy()) { 
-  $insert_logNo = "UPDATE `USERS` SET `is_logged_user` = b'0' WHERE `email_user` = '$email'";
+  $insert_logNo = "UPDATE `USERS` SET `is_logged_user` = 0 WHERE `email_user` = '$email'";
   try {
     $stmt = $dbh->query($insert_logNo);
   }

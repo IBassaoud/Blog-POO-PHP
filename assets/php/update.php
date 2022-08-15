@@ -36,20 +36,14 @@ if(!isset($_SESSION['user']) || !isset($_SESSION['admin']) || !isset($_SESSION['
           <li>
             <a href="http://localhost:8006" class="block py-2 pr-4 pl-3 text-blue-700 rounded hover:bg-blue-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-blue-700 md:dark:hover:text-blue-400 dark:hover:bg-blue-700 dark:hover:text-white md:dark:hover:bg-transparent" aria-current="page">Home</a>
           </li>
-          <?php
-            if (isset($_SESSION['admin'])){
-            ?>
             <li>
-              <a href="#" class="block py-2 pr-4 pl-3 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-black dark:hover:bg-blue-700 dark:hover:text-white md:dark:hover:bg-transparent">Dashboard</a>
+              <a href="#" class="block py-2 pr-4 pl-3 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-black dark:hover:bg-blue-700 dark:hover:text-white md:dark:hover:bg-transparent">Profile</a>
             </li>
-            <?php
-            }
-            ?>
           <li>
             <a href="http://localhost:8006/assets/php/posts.php" class="block py-2 pr-4 pl-3 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-black dark:hover:bg-blue-700 dark:hover:text-white md:dark:hover:bg-transparent">Posts</a>
           </li>
           <?php
-          if (isset($_SESSION['user']) || isset($_SESSION['admin'])){
+          if (isset($_SESSION['user']) || isset($_SESSION['admin']) || isset($_SESSION['moderator'])){
           ?>
           <li>
             <a href="http://localhost:8006/assets/php/create_post.php" class="block py-2 pr-4 pl-3 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-black dark:hover:bg-blue-700 dark:hover:text-white md:dark:hover:bg-transparent">Create Post</a>
@@ -77,3 +71,6 @@ if(!isset($_SESSION['user']) || !isset($_SESSION['admin']) || !isset($_SESSION['
     </div>
   </nav>
 </header>
+<script src="https://unpkg.com/flowbite@1.5.1/dist/flowbite.js"></script>
+</body>
+</html>

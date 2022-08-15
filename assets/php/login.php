@@ -25,7 +25,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['email'] != "" && $_POST['pass
         echo "Request failed: " . $e->getMessage();
     }
     if (password_verify($_POST['password'],$stmt_checkPass['pw_user']) == true){
-      $insert_logYes = "UPDATE `USERS` SET `is_logged_user` = b'1' WHERE `email_user` = '$email'";
+      $insert_logYes = "UPDATE `USERS` SET `is_logged_user` = 1 WHERE `email_user` = '$email'";
       try {
         $stmt2 = $dbh->query($insert_logYes);
       }
@@ -79,7 +79,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['email'] != "" && $_POST['pass
     <script src="/assets/js/navbar.js"></script>
     <title>Sign in</title>
 </head>
-<body class="overflow-hidden">
+<body>
 <header> 
   <nav class="bg-white border-gray-200 px-2 sm:px-4 py-2.5 rounded white:bg-gray-900">
     <div class="container flex flex-wrap justify-between items-center mx-auto ">
@@ -97,20 +97,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['email'] != "" && $_POST['pass
           <li>
             <a href="http://localhost:8006" class="block py-2 pr-4 pl-3 text-blue-700 rounded hover:bg-blue-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-blue-700 md:dark:hover:text-blue-400 dark:hover:bg-blue-700 dark:hover:text-white md:dark:hover:bg-transparent" aria-current="page">Home</a>
           </li>
-          <?php
-            if (isset($_SESSION['admin'])){
-            ?>
             <li>
-              <a href="http://localhost:8006/assets/php/dashboard.php" class="block py-2 pr-4 pl-3 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-black dark:hover:bg-blue-700 dark:hover:text-white md:dark:hover:bg-transparent">Dashboard</a>
+              <a href="http://localhost:8006/assets/php/dashboard.php" class="block py-2 pr-4 pl-3 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-black dark:hover:bg-blue-700 dark:hover:text-white md:dark:hover:bg-transparent">Profile</a>
             </li>
-            <?php
-            }
-            ?>
           <li>
             <a href="http://localhost:8006/assets/php/posts.php" class="block py-2 pr-4 pl-3 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-black dark:hover:bg-blue-700 dark:hover:text-white md:dark:hover:bg-transparent">Posts</a>
           </li>
           <?php
-          if (isset($_SESSION['user']) || isset($_SESSION['admin'])){
+          if (isset($_SESSION['user']) || isset($_SESSION['admin']) || isset($_SESSION['moderator'])){
           ?>
           <li>
             <a href="http://localhost:8006/assets/php/create_post.php" class="block py-2 pr-4 pl-3 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-black dark:hover:bg-blue-700 dark:hover:text-white md:dark:hover:bg-transparent">Create Post</a>
@@ -139,10 +133,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['email'] != "" && $_POST['pass
   </nav>
 </header>
 <!-- ########## BODY ########## -->
-<section class="h-screen w-screen">
+<section class="h-screen w-screen overflow-x-hidden">
   <div class="px-6 h-full text-gray-800">
     <div
-      class="flex xl:justify-center lg:justify-between justify-center items-center flex-wrap h-full g-6 overflow-y-hidden"
+      class="flex xl:justify-center lg:justify-between justify-center items-center flex-wrap h-full g-6"
     >
       <div
         class="grow-0 shrink-1 md:shrink-0 basis-auto xl:w-6/12 lg:w-6/12 md:w-11/12 mb-12 md:mb-0"
@@ -258,7 +252,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['email'] != "" && $_POST['pass
             <button type="Submit" class="inline-block px-8 py-3 bg-blue-600 text-white font-medium text-sm leading-snug uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out">
               Login
             </button>
-            <p class="text-sm font-semibold mt-2 pt-1 mb-0">
+            <p class="text-sm font-semibold mt-2 pt-1 mb-6">
               Don't have an account?
               <a
                 href="register.php"

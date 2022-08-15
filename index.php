@@ -1,7 +1,66 @@
 <?php 
+use App\Autoloader;
+use App\models\UsersModel;
+use App\models\PostsModel;
+require_once('Autoloader.php');
+Autoloader::register();
+
+$modelPost = new PostsModel;
+$newPost = $modelPost
+            ->setFk_id_user(6)
+            ->setTitle_post("Alchemy of Souls") 
+            ->setDescription_post("Alchemy of Souls (Korean: 환혼; Hanja: 還魂; RR: Hwanhon) is an ongoing South Korean television series starring Lee Jae-wook, Jung So-min, and Hwang Min-hyun.[9] Written by the Hong sisters, it depicts the stories of young mages dealing with heaven and earth.")
+            ->setViews_post(0)
+            ->setImage_post("../img/uploads/alchemy_of_souls.jpg.png")
+            ->setBody_post("The fate of these people become twisted due to 'hwanhonsool' (the soul of the dead return to the living).
+
+            In the country of Daeho, Jang Uk (Lee Jae-Wook) comes from the noble Jang family. He holds an unpleasant secret about his birth, which people all around the country talk about. He is troublemaker. Jang Ukk happens to meet Mu-Deok (Jung So-Min). She is an elite warrior, but her soul is trapped in a physically weak body. She becomes Jang Wook’s servant, but she also secretly teaches him how to fight.
+            
+            Seo Yul (Minhyun) comes from the noble Seo family. He seems perfect with good appearance, intelligence, and strong martial arts skills. Go Won (Shin Seung-Ho) is the crown prince of Daeho. He hopes to become a generous king.")
+            ->setPublished_post(0);
+// echo "<pre>";
+// var_dump($newPost);
+// echo "</pre>";
+// $modelPost->create($newPost);
+$donnees = [
+  "published_post" => 0,
+  "views_post" => 1
+];
+// $updatePost = $modelPost->hydrate($donnees);
+// $modelPost->update(12,$updatePost);
+// $userData = $modelPost->findBy(["fk_id_user" => 6]); 
+// $userData = $modelPost->delete(9);
+// var_dump($userData);
+
+$modelUser = new UsersModel;
+// $newUser = $modelUser
+//             ->setPrenom_user("Zinedine")
+//             ->setNom_user("Zidane")
+//             ->setPseudo_user("Zizou")
+//             ->setEmail_user("zinedine@zidane.fr")
+//             ->setRole_user("Moderator")
+//             ->setPw_user("zizou123")
+//             ->setIs_logged_user(0);
+// echo "<pre>";
+// var_dump($newUser);
+// echo "</pre>";
+// $modelUser->create($newUser);
+$donneesUser = [
+  "pw_user" => password_hash("zizou123", PASSWORD_ARGON2I),
+  "is_logged_user" => 1
+];
+// $updateUser = $modelUser->hydrate($donneesUser);
+// $modelUser->update(8,$updateUser);
+// $modelUser->delete(9);
+// $allUsers = $modelUser->findAll();
+// echo "<pre>";
+// var_dump($allUsers);
+// echo "</pre>";
+// exit;
 require_once('pdo.php');
 require_once('assets/class/User.php');
 require_once('assets/class/Post.php');
+
 session_start();
 
 $read_query_mainpage = "SELECT * FROM `POSTS` ORDER BY `created_at` DESC LIMIT 5;";
@@ -69,20 +128,14 @@ for ($i=0;$i<$length;$i++){
           <li>
             <a href="http://localhost:8006" class="block py-2 pr-4 pl-3 text-blue-700 rounded hover:bg-blue-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-blue-700 md:dark:hover:text-blue-400 dark:hover:bg-blue-700 dark:hover:text-white md:dark:hover:bg-transparent" aria-current="page">Home</a>
           </li>
-          <?php
-            if (isset($_SESSION['admin'])){
-            ?>
             <li>
-              <a href="http://localhost:8006/assets/php/dashboard.php" class="block py-2 pr-4 pl-3 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-black dark:hover:bg-blue-700 dark:hover:text-white md:dark:hover:bg-transparent">Dashboard</a>
+              <a href="http://localhost:8006/assets/php/dashboard.php" class="block py-2 pr-4 pl-3 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-black dark:hover:bg-blue-700 dark:hover:text-white md:dark:hover:bg-transparent">Profile</a>
             </li>
-            <?php
-            }
-            ?>
           <li>
             <a href="http://localhost:8006/assets/php/posts.php" class="block py-2 pr-4 pl-3 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-black dark:hover:bg-blue-700 dark:hover:text-white md:dark:hover:bg-transparent">Posts</a>
           </li>
           <?php
-          if (isset($_SESSION['user']) || isset($_SESSION['admin'])){
+          if (isset($_SESSION['user']) || isset($_SESSION['admin']) || isset($_SESSION['moderator'])){
           ?>
           <li>
             <a href="http://localhost:8006/assets/php/create_post.php" class="block py-2 pr-4 pl-3 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-black dark:hover:bg-blue-700 dark:hover:text-white md:dark:hover:bg-transparent">Create Post</a>
