@@ -1,6 +1,6 @@
 <?php
 
-$connex = "mysql:dbname=BLOG_DB;host=172.21.0.2:3306;";
+$connex = "mysql:dbname=blog_db;host=dbblog:3306;";
 $user = "ism34";
 $pw = "admin";
 $root = "root";

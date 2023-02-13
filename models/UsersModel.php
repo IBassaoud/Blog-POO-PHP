@@ -20,7 +20,8 @@ namespace App\models
             // __NAMESPACE__ = App\models\UsersModel  || __CLASS__ = App\models
             // remove the path "App\models\ to leave UsersModel
             $class = str_replace(__NAMESPACE__ . '\\', '', __CLASS__);
-            // remove "Model" and make the rest "Projects" UPPERCASE and assign it to table wich is the table name in my DB
+            // remove "Model" and make the rest class name UPPERCASE and assign it to the proprety table wich is the table name in my DB
+            // NAMING CLASS IS VERY IMPORTANT AND MUST MATCH THE DB TABLES NAME
             $this->table = strtoupper(str_replace('Model','', $class ));
         }
 

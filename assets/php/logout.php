@@ -1,14 +1,19 @@
 <?php
-require_once("../../pdo.php");
 require_once("../class/User.php");
 session_start();
+use App\Autoloader;
+use App\core\Db;
+
+require_once('../../Autoloader.php');
+Autoloader::register();
+$db = Db::getInstance();
 
 if (isset($_SESSION['user'])){
   $email = $_SESSION['user']->getEmail();
   if(session_destroy()) { 
   $insert_logNo = "UPDATE `USERS` SET `is_logged_user` = 0 WHERE `email_user` = '$email'";
   try {
-    $stmt = $dbh->query($insert_logNo);
+    $stmt = $db->query($insert_logNo);
   }
   catch (PDOException $e) {
       echo "Update failed: " . $e->getMessage();
@@ -23,7 +28,7 @@ if (isset($_SESSION['admin'])){
   if(session_destroy()) { 
   $insert_logNo = "UPDATE `USERS` SET `is_logged_user` = 0 WHERE `email_user` = '$email'";
   try {
-    $stmt = $dbh->query($insert_logNo);
+    $stmt = $db->query($insert_logNo);
   }
   catch (PDOException $e) {
       echo "Update failed: " . $e->getMessage();
@@ -38,7 +43,7 @@ if (isset($_SESSION['moderator'])){
   if(session_destroy()) { 
   $insert_logNo = "UPDATE `USERS` SET `is_logged_user` = 0 WHERE `email_user` = '$email'";
   try {
-    $stmt = $dbh->query($insert_logNo);
+    $stmt = $db->query($insert_logNo);
   }
   catch (PDOException $e) {
       echo "Update failed: " . $e->getMessage();

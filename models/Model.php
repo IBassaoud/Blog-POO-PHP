@@ -1,6 +1,6 @@
 <?php
-namespace App\models
-{
+
+namespace App\models {
 
     use App\core\Db;
 
@@ -16,17 +16,22 @@ namespace App\models
         // PARTIE Read  
         public function findAll()
         {
-            $query = $this->query_DB("SELECT * FROM ". $this->table);
+            $query = $this->query_DB("SELECT * FROM " . $this->table);
             return $query->fetchAll();
         }
 
+        /**
+         * Find records in the database based on given criteria
+         * @param array $criteres - Criteria for searching in the database
+         * @return array - Result of the query 
+         */
         public function findBy(array $criteres)
         {
             $champs = [];
             $valeurs = [];
-            
+
             // On boucle pour éclater le tableau
-            foreach ($criteres as $champ => $valeur){
+            foreach ($criteres as $champ => $valeur) {
                 // SELECT * FROM USERS WHERE `status_job` = ? AND `age` = 0 
                 $champs[] = "$champ = ?";
                 $valeurs[] = $valeur;
@@ -35,17 +40,26 @@ namespace App\models
             $list_champs = implode(' AND ', $champs);
             // On execute la requête
             return $this->query_DB("SELECT * FROM " . $this->table . " WHERE " . $list_champs, $valeurs)->fetchAll();
-
         }
+
         public function findOrderbyLimit(array $order, int $limit)
         {
-            $orderby = key($order); 
+            $orderby = key($order);
             $orderColumn = $order[$orderby];
+
+            // Validate and sanitize the input data
+            if (!in_array($orderby, ['ASC', 'DESC'])) {
+                throw new \Exception("Invalid orderby value. Only 'ASC' or 'DESC' are allowed.");
+            }
+            $allowedColumns = ['created_at', 'updated_at', 'id','id_post','id_comment'];
+            if (!in_array($orderColumn, $allowedColumns)) {
+                throw new \Exception("Invalid order column value. Only 'created_at', 'updated_at', or 'id' are allowed.");
+            }
 
             // On execute la requête
             // SELECT * FROM `POSTS` ORDER BY `created_at` DESC LIMIT 5
-            if (!empty($order)){
-                if ($limit != null){
+            if (!empty($order)) {
+                if ($limit != null) {
                     return $this->query_DB("SELECT * FROM " . $this->table . " ORDER BY " . $orderColumn . " " . $orderby . " LIMIT " . $limit)->fetchAll();
                 } else {
                     return $this->query_DB("SELECT * FROM " . $this->table . " ORDER BY " . $orderColumn . " " . $orderby)->fetchAll();
@@ -56,7 +70,7 @@ namespace App\models
         public function find(int $id, string $tab)
         {
             // Pour aller chercher spécifiquement 1 seul utilisateur par son id
-            return $this->query_DB("SELECT * FROM " . $this->table . " WHERE id". $tab ." = " . $id)->fetch();
+            return $this->query_DB("SELECT * FROM " . $this->table . " WHERE id" . $tab . " = " . $id)->fetch();
         }
 
         // PARTIE Create
@@ -66,46 +80,59 @@ namespace App\models
             $champs = [];
             $inter = [];
             $valeurs = [];
-            
+
             // On boucle pour éclater le tableau
-            foreach ($model as $champ => $valeur){
-                $name_column = "id_" . rtrim(strtolower($this->table),"s");
+            foreach ($model as $champ => $valeur) {
+                $name_column = "id_" . rtrim(strtolower($this->table), "s");
                 // INSERT INTO USERS (`name`,`username`,`email`,`password`,`title`,`aboutme`,`city`,`country`,`facebook`,`twitter`,`instagram`,`youtube`,`linkedin`,`github`,`slogan`,`birthday`,`website`,`phone`,`age`,`degree`,`status_job`,`certification`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) 
                 // J'éxclue les champs non désirée pour ma requête création d'un utilisateur
-                if ($valeur !== null && $champ != $name_column && $champ != 'db' && $champ != 'table' && $champ != 'created_at' && $champ != 'updated_at'){
-                    $champs[] = "`" . $champ ."`";
+                if ($valeur !== null && $champ != $name_column && $champ != 'db' && $champ != 'table' && $champ != 'created_at' && $champ != 'updated_at') {
+                    $champs[] = "`" . $champ . "`";
                     $inter[] = "?";
                     $valeurs[] = $valeur;
                 }
             }
             // On transforme le tableau "champs" en une chaine de caractères séparé par des AND
-            $list_champs = implode(', ', $champs); 
-            $list_inter = implode(', ', $inter); 
+            $list_champs = implode(', ', $champs);
+            $list_inter = implode(', ', $inter);
             // On execute la requête
-            return $this->query_DB("INSERT INTO " . $this->table . " (" . $list_champs . ") VALUES (". $list_inter.")", $valeurs);
+            return $this->query_DB("INSERT INTO " . $this->table . " (" . $list_champs . ") VALUES (" . $list_inter . ")", $valeurs);
         }
 
 
         // PARTIE Update
+        public function hydrate(array $donnees)
+        {
+            foreach ($donnees as $k => $v) {
+                // On récupère le nom du setter correspondant à la clé (key)
+                $setter = "set" . ucfirst($k);
+
+                // On vérifie si le setter existe
+                if (method_exists($this, $setter)) {
+                    // Si oui, on appelle le setter avec sa valeur en argument
+                    $this->$setter($v);
+                }
+            }
+            return $this;
+        }
         // Mettre à jour un utilisateur
-        public function update(int $id, Model $model)  // Il faut un id pour cibler l'élement à modifier
+        public function update(int $id, Model $model)
         {
             $champs = [];
             $valeurs = [];
-            $name_column = "`$this->table`.id_" . rtrim(strtolower($this->table),"s");
+            $name_column = "`$this->table`.id_" . rtrim(strtolower($this->table), "s");
             // On boucle pour éclater le tableau
-            foreach ($model as $champ => $valeur){
-                // UPDATE USERS SET `name` = ?`username` = ?`email` = ?`password` = ?`title` = ?`aboutme` = ?`city` = ?`country` = ?`facebook` = ?`twitter` = ?`instagram` = ?`youtube` = ?`linkedin` = ?`github` = ?`slogan` = ?`birthday` = ?`website` = ?`phone` = ?`age` = ?`degree` = ?`status_job` = ?`certification` = ? WHERE `id` = ?
-                if (isset($valeur) && $champ != $name_column && $champ != 'db' && $champ != 'table' && $champ != 'created_at'){
-                    $champs[] = "`$champ` = ?"; 
+            foreach ($model as $champ => $valeur) {
+                if (isset($valeur) && $champ != $name_column && $champ != 'db' && $champ != 'table' && $champ != 'created_at') {
+                    $champs[] = "`$champ` = ?";
                     $valeurs[] = $valeur;
                 }
             }
             $valeurs[] = $id;
             // On transforme le tableau "champs" en une chaine de caractères séparé par des AND
-            $list_champs = implode(', ', $champs); 
+            $list_champs = implode(', ', $champs);
             // On execute la requête
-            return $this->query_DB("UPDATE " . $this->table . " SET " . $list_champs . " WHERE ". $name_column ." = ?", $valeurs);
+            return $this->query_DB("UPDATE " . $this->table . " SET " . $list_champs . " WHERE " . $name_column . " = ?", $valeurs);
         }
 
 
@@ -114,9 +141,9 @@ namespace App\models
         public function delete(int $id)
         {
             // Rend en minuscule le nom de la table et supprime le "s" en fin de la chaine de caractère
-            $name_column = "id_" . rtrim(strtolower($this->table),"s");
+            $name_column = "id_" . rtrim(strtolower($this->table), "s");
             // retourne la requête avec le bon nom de colonne qui commence avec "id_" suivi du nom de la table en miniuscule et au singulier
-            return $this->query_DB('DELETE FROM ' . $this->table . " WHERE " . $name_column ." = ? ", [$id]);
+            return $this->query_DB('DELETE FROM ' . $this->table . " WHERE " . $name_column . " = ? ", [$id]);
         }
 
 
@@ -126,7 +153,7 @@ namespace App\models
             $this->db = Db::getInstance();
 
             // On vérifie si on a des attributs
-            if ($attributs !== null ){
+            if ($attributs !== null) {
                 // Requête préparée 
                 $query = $this->db->prepare($sql);
                 $query->execute($attributs);
@@ -136,23 +163,5 @@ namespace App\models
                 return $this->db->query($sql);
             }
         }
-
-
-        public function hydrate(array $donnees) // ca ressemble à l'entité dans symfony
-        {
-            foreach ($donnees as $k => $v){
-                // On récupère le nom du setter correspondant à la clé (key)
-                // titre -> setTitre
-                $setter = "set" . ucfirst($k);
-
-                // On vérifie si le setter existe
-                if (method_exists($this, $setter)){
-                    // Si oui, on appelle le setter
-                    $this->$setter($v);
-                }
-            } 
-            return $this;
-        }
     }
 }
-?>
